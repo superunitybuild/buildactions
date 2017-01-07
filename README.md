@@ -22,6 +22,18 @@ Refer to the [SuperUnityBuild wiki][unitybuild-wiki] for basic information on ho
 * **File Operations Utility**
 * [**itch.io Butler Upload**][itchuploader]
 
+## Contributing
+Bug reports, feature requests, and pull requests are welcome and appreciated.
+
+## Credits
+* **Chase Pettit** - [github](https://github.com/Chaser324), [twitter](http://twitter.com/chasepettit)
+
+## License
+All code in this repository ([unity-build-actions](https://github.com/Chaser324/unity-build-actions)) is made freely available under the MIT license. This essentially means you're free to use it however you like as long as you provide attribution.
+
+
+
+
 
 [download]: https://github.com/Chaser324/unity-build-actions/archive/master.zip
 [unitybuild]: https://github.com/Chaser324/unity-build
