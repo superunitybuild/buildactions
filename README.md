@@ -16,11 +16,11 @@ Refer to the [SuperUnityBuild wiki][unitybuild-wiki] for basic information on ho
 
 ## Tools
 
-* [**AssetBundle Builder**][assetbundle]
-* **Batch File Runner**
-* [**Zip File Utility**][zipfile]
-* **File Operations Utility**
-* [**itch.io Butler Upload**][itchuploader]
+* [**AssetBundle Builder**][assetbundle] - AssetBundle building and file management. Includes functionality to generate AssetBundles outside of the overall build procedure.
+* [**Batch File Runner**][] - Run batch files or other external applications.
+* [**Zip File Utility**][zipfile] - Compress builds and other files into ZIP file format.
+* [**File Operations Utility**][] - Perform basic file operations like copy, move, and delete.
+* [**itch.io Butler Upload**][itchuploader] - Upload builds to itch.io using their [Butler](https://github.com/itchio/butler) utility.
 
 ## Contributing
 Bug reports, feature requests, and pull requests are welcome and appreciated.
