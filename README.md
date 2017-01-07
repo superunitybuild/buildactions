@@ -1,5 +1,5 @@
 # SuperUnityBuild - BuildActions
-> BuildActions for use with the [SuperUnityBuild](unitybuild) build automation tool.
+> BuildActions for use with the [SuperUnityBuild][unitybuild] build automation tool.
 
 BuildActions are one of the key components that make the [SuperUnityBuild][unitybuild] build automation tool flexible and powerful. Each one extends the capabilities of SuperUnityBuild and can be easily setup and customized to suit your needs, and if there's some other specialized functionality that your project needs, you can simply write your own BuildActions and integrate them into the build process.
 
