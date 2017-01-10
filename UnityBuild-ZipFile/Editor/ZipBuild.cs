@@ -1,12 +1,10 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using Ionic.Zip;
 using System.IO;
-using Ionic.Zip;
 
 namespace SuperSystems.UnityBuild
 {
 
-public class ZipBuildUtility : PostBuildAction
+public class ZipBuild : PostBuildAction
 {
     public string inputPath = "$BUILDPATH";
     public string outputPath = "$BUILDPATH";
@@ -42,6 +40,7 @@ public class ZipBuildUtility : PostBuildAction
         }
         catch
         {
+            // TODO: Log error.
         }
     }
 }
