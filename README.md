@@ -31,6 +31,8 @@ Bug reports, feature requests, and pull requests are welcome and appreciated.
 ## License
 All code in this repository ([unity-build-actions](https://github.com/Chaser324/unity-build-actions)) is made freely available under the MIT license. This essentially means you're free to use it however you like as long as you provide attribution.
 
+Zip File Utility includes a pre-compiled DotNetZip library which is licensed under the Ms-PL. See [DotNetZip's repository](https://dotnetzip.codeplex.com/) for more info.
+
 
 
 
