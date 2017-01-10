@@ -46,13 +46,18 @@ public sealed class BuildAssetBundles : PreBuildAction
             BuildDistribution dist;
             string configKey = buildConfigs[i];
 
-            //BuildNotificationList.instance.AddNotification(new BuildNotification(
-            //    BuildNotification.Category.Notification,
-            //    string.Format("Building ({0}/{1}): ", i + 1, buildConfigs.Length), configKey,
-            //    true, null));
-
             BuildSettings.projectConfigurations.ParseKeychain(configKey, out releaseType, out platform, out arch, out dist);
             Build(platform, arch);
+        }
+    }
+
+    protected override void DrawProperties(SerializedObject obj)
+    {
+        base.DrawProperties(obj);
+
+        if (GUILayout.Button("Run Now", GUILayout.ExpandWidth(true)))
+        {
+            BuildAll();
         }
     }
 
