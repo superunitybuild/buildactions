@@ -14,7 +14,12 @@ public sealed class BuildAssetBundles : BuildAction, IPreBuildPerPlatformAction
     public string baseBuildPath = Path.Combine("bin", "bundles");
 
     public string innerBuildPath = Path.Combine("$PLATFORM", "$ARCHITECTURE");
-    public BuildAssetBundleOptions options = BuildAssetBundleOptions.ChunkBasedCompression;
+
+#if UNITY_5_3 || UNITY_5_4_OR_NEWER
+    BuildAssetBundleOptions options = BuildAssetBundleOptions.ChunkBasedCompression;
+#else
+    BuildAssetBundleOptions options = BuildAssetBundleOptions.None;
+#endif
 
     #endregion
 
