@@ -20,7 +20,6 @@ Refer to the [SuperUnityBuild wiki][unitybuild-wiki] for basic information on ho
 * [**Script Runner**][scriptrunner] - Run batch/script files or other external applications.
 * [**Zip File Utility**][zipfile] - Compress builds and other files into ZIP file format.
 * [**File Operations Utility**][fileutil] - Perform basic file/folder operations like copy, move, and delete.
-* [**itch.io Uploader**][itchuploader] - Upload builds to itch.io using their [Butler](https://github.com/itchio/butler) utility.
 
 ## Contributing
 Bug reports, feature requests, and pull requests are welcome and appreciated.
