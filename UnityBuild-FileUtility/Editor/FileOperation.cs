@@ -63,7 +63,7 @@ public class FileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformA
 
     protected override void DrawProperties(SerializedObject obj)
     {
-        bool containsWildcard = Path.GetFileNameWithoutExtension(inputPath).Contains("*");
+        bool containsWildcard = string.IsNullOrEmpty(inputPath) ? false : Path.GetFileNameWithoutExtension(inputPath).Contains("*");
 
         EditorGUILayout.PropertyField(obj.FindProperty("operation"));
 
@@ -78,7 +78,7 @@ public class FileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformA
 
     private void Move(string inputPath, string outputPath, bool overwrite = true)
     {
-        bool containsWildcard = Path.GetFileNameWithoutExtension(inputPath).Contains("*");
+        bool containsWildcard = string.IsNullOrEmpty(inputPath) ? false : Path.GetFileNameWithoutExtension(inputPath).Contains("*");
 
         if (!containsWildcard && !File.Exists(inputPath))
         {
@@ -119,7 +119,7 @@ public class FileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformA
 
     private void Copy(string inputPath, string outputPath, bool overwrite = true)
     {
-        bool containsWildcard = Path.GetFileNameWithoutExtension(inputPath).Contains("*");
+        bool containsWildcard = string.IsNullOrEmpty(inputPath) ? false : Path.GetFileNameWithoutExtension(inputPath).Contains("*");
 
         if (!containsWildcard && !File.Exists(inputPath))
         {
@@ -160,7 +160,7 @@ public class FileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformA
 
     private void Delete(string inputPath)
     {
-        bool containsWildcard = Path.GetFileNameWithoutExtension(inputPath).Contains("*");
+        bool containsWildcard = string.IsNullOrEmpty(inputPath) ? false : Path.GetFileNameWithoutExtension(inputPath).Contains("*");
 
         if (!containsWildcard && File.Exists(inputPath))
         {
