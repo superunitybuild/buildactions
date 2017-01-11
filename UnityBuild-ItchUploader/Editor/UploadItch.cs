@@ -5,7 +5,7 @@ using System.IO;
 namespace SuperSystems.UnityBuild
 {
 
-public class UploadItch : PostBuildAction
+public class UploadItch : BuildAction
 {
     private const string WINDOWS = "windows";
     private const string OSX = "osx";

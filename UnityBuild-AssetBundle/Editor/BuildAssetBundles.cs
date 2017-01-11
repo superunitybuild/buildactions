@@ -1,24 +1,20 @@
 ﻿using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
 namespace SuperSystems.UnityBuild
 {
 
-public sealed class BuildAssetBundles : PreBuildAction
+public sealed class BuildAssetBundles : BuildAction, IPreBuildPerPlatformAction
 {
     #region Public Variables
 
     [FilePath(true, true, "Select AssetBundle output directory.")]
-    public string buildPath = Path.Combine("bin", "bundles");
+    public string baseBuildPath = Path.Combine("bin", "bundles");
 
-    public bool chunkBased = true;
-    public bool uncompressed = false;
-    public bool disableWriteTypeTree = false;
-    public bool ignoreTypeTreeChanges = false;
-    public bool forceRebuild = false;
-    public bool appendHash = false;
-    public bool strictMode = false;
+    public string innerBuildPath = Path.Combine("$PLATFORM", "$ARCHITECTURE");
+    public BuildAssetBundleOptions options = BuildAssetBundleOptions.ChunkBasedCompression;
 
     #endregion
 
@@ -53,7 +49,9 @@ public sealed class BuildAssetBundles : PreBuildAction
 
     protected override void DrawProperties(SerializedObject obj)
     {
-        base.DrawProperties(obj);
+        EditorGUILayout.PropertyField(obj.FindProperty("baseBuildPath"));
+        EditorGUILayout.PropertyField(obj.FindProperty("innerBuildPath"));
+        options = (BuildAssetBundleOptions)EditorGUILayout.EnumMaskField("Options", options);
 
         if (GUILayout.Button("Run Now", GUILayout.ExpandWidth(true)))
         {
@@ -70,32 +68,17 @@ public sealed class BuildAssetBundles : PreBuildAction
         if (!platform.enabled || !arch.enabled)
             return;
 
-        // Create options mask.
-        BuildAssetBundleOptions options = BuildAssetBundleOptions.None;
-        
-        if (uncompressed)
-            options |= BuildAssetBundleOptions.UncompressedAssetBundle;
-        if (disableWriteTypeTree)
-            options |= BuildAssetBundleOptions.DisableWriteTypeTree;
-        if (forceRebuild)
-            options |= BuildAssetBundleOptions.ForceRebuildAssetBundle;
-        if (ignoreTypeTreeChanges)
-            options |= BuildAssetBundleOptions.IgnoreTypeTreeChanges;
-        if (appendHash)
-            options |= BuildAssetBundleOptions.AppendHashToAssetBundleName;
-        if (chunkBased)
-            options |= BuildAssetBundleOptions.ChunkBasedCompression;
-        if (strictMode)
-            options |= BuildAssetBundleOptions.StrictMode;
-        
-        string platformBundlePath = Path.Combine(buildPath, Path.Combine(platform.platformName, arch.name));
+        // Resolve build path.
+        StringBuilder platformBundlePath = new StringBuilder(Path.Combine(baseBuildPath, innerBuildPath));
+        platformBundlePath.Replace("$PLATFORM", BuildProject.SanitizeFolderName(platform.platformName));
+        platformBundlePath.Replace("$ARCHITECTURE", BuildProject.SanitizeFolderName(arch.name));
 
         // Create build destination directory if it does not exist.
-        if (!Directory.Exists(platformBundlePath))
-            Directory.CreateDirectory(platformBundlePath);
+        if (!Directory.Exists(platformBundlePath.ToString()))
+            Directory.CreateDirectory(platformBundlePath.ToString());
 
         // Build AssetBundles.
-        BuildPipeline.BuildAssetBundles(platformBundlePath, options, arch.target);
+        BuildPipeline.BuildAssetBundles(platformBundlePath.ToString(), options, arch.target);
     }
 
     #endregion

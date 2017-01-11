@@ -4,7 +4,7 @@ using System.IO;
 namespace SuperSystems.UnityBuild
 {
 
-public class ZipBuild : PostBuildAction
+public class ZipFileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction
 {
     public string inputPath = "$BUILDPATH";
     public string outputPath = "$BUILDPATH";
@@ -13,10 +13,10 @@ public class ZipBuild : PostBuildAction
     public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref UnityEditor.BuildOptions options, string configKey, string buildPath)
     {
         string resolvedOutputPath = Path.Combine(inputPath.Replace("$BUILDPATH", buildPath), outputFileName);
-        resolvedOutputPath = BuildProject.GenerateBuildPath(resolvedOutputPath, releaseType, platform, architecture, distribution, buildTime);
+        resolvedOutputPath = BuildProject.ResolvePath(resolvedOutputPath, releaseType, platform, architecture, distribution, buildTime);
 
         string resolvedInputPath = inputPath.Replace("$BUILDPATH", buildPath);
-        resolvedInputPath = BuildProject.GenerateBuildPath(resolvedInputPath, releaseType, platform, architecture, distribution, buildTime);
+        resolvedInputPath = BuildProject.ResolvePath(resolvedInputPath, releaseType, platform, architecture, distribution, buildTime);
 
         if (!resolvedOutputPath.EndsWith(".zip"))
             resolvedOutputPath += ".zip";
