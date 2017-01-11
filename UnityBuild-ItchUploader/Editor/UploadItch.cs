@@ -13,28 +13,28 @@ public class UploadItch : BuildAction
 
     #region MenuItems
 
-    [MenuItem("Build/Upload/itch.io/Execute", false, 50)]
-    private static void UploadAll()
-    {
+    //[MenuItem("Build/Upload/itch.io/Execute", false, 50)]
+    //private static void UploadAll()
+    //{
         //for (int i = 0; i < BuildProject.platforms.Count; i++)
         //{
         //    BuildPlatform platform = BuildProject.platforms[i];
         //    PerformUpload(platform);
         //}
-    }
+    //}
 
-    [MenuItem("Build/Upload/itch.io/Auto Upload")]
-    private static void ToggleAutoUpload()
-    {
-        EditorPrefs.SetBool("buildUploadItchAuto", !EditorPrefs.GetBool("buildUploadItchAuto", false));
-    }
+    //[MenuItem("Build/Upload/itch.io/Auto Upload")]
+    //private static void ToggleAutoUpload()
+    //{
+    //    EditorPrefs.SetBool("buildUploadItchAuto", !EditorPrefs.GetBool("buildUploadItchAuto", false));
+    //}
 
-    [MenuItem("Build/Upload/itch.io/Auto Upload", true)]
-    private static bool ToggleAutoUploadValidate()
-    {
-        Menu.SetChecked("Build/Upload/itch.io/Auto Upload", EditorPrefs.GetBool("buildUploadItchAuto", false));
-        return true;
-    }
+    //[MenuItem("Build/Upload/itch.io/Auto Upload", true)]
+    //private static bool ToggleAutoUploadValidate()
+    //{
+    //    Menu.SetChecked("Build/Upload/itch.io/Auto Upload", EditorPrefs.GetBool("buildUploadItchAuto", false));
+    //    return true;
+    //}
 
     #endregion
 
