@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections;
 using System.IO;
+using System.Diagnostics;
 
 namespace SuperSystems.UnityBuild
 {
@@ -35,6 +36,8 @@ public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfor
                 Delete(inputPath);
                 break;
         }
+
+        AssetDatabase.Refresh();
     }
 
     public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
@@ -54,6 +57,8 @@ public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfor
                 Delete(resolvedInputPath);
                 break;
         }
+
+        AssetDatabase.Refresh();
     }
 
     protected override void DrawProperties(SerializedObject obj)
@@ -67,40 +72,73 @@ public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfor
 
     private void Move(string inputPath, string outputPath, bool overwrite = true)
     {
+        bool success = true;
+        string errorString = "";
+
         if (!Directory.Exists(inputPath))
         {
             // Error. Input does not exist.
-            return;
+            success = false;
+            errorString = "Input does not exist.";
         }
 
         if (overwrite && Directory.Exists(outputPath))
         {
             // Delete previous output.
-            FileUtil.DeleteFileOrDirectory(outputPath);
+            success = FileUtil.DeleteFileOrDirectory(outputPath);
+
+            if (!success)
+                errorString = "Could not overwrite existing folder.";
         }
 
         FileUtil.MoveFileOrDirectory(inputPath, outputPath);
+
+        if (!success && !string.IsNullOrEmpty(errorString))
+        {
+            BuildNotificationList.instance.AddNotification(new BuildNotification(
+                BuildNotification.Category.Error,
+                "Folder Move Failed.", errorString,
+                true, null));
+        }
     }
 
     private void Copy(string inputPath, string outputPath, bool overwrite = true)
     {
+        bool success = true;
+        string errorString = "";
+
         if (!Directory.Exists(inputPath))
         {
             // Error. Input does not exist.
-            return;
+            success = false;
+            errorString = "Input does not exist.";
         }
 
-        if (overwrite && Directory.Exists(outputPath))
+        if (success && overwrite && Directory.Exists(outputPath))
         {
             // Delete previous output.
-            FileUtil.DeleteFileOrDirectory(outputPath);
+            success = FileUtil.DeleteFileOrDirectory(outputPath);
+
+            if (!success)
+                errorString = "Could not overwrite existing folder.";
         }
 
         FileUtil.CopyFileOrDirectory(inputPath, outputPath);
+
+        if (!success && !string.IsNullOrEmpty(errorString))
+        {
+            BuildNotificationList.instance.AddNotification(new BuildNotification(
+                BuildNotification.Category.Error,
+                "Folder Copy Failed.", errorString,
+                true, null));
+        }
     }
 
     private void Delete(string inputPath)
     {
+        bool success = true;
+        string errorString = "";
+
         if (Directory.Exists(inputPath))
         {
             FileUtil.DeleteFileOrDirectory(inputPath);
@@ -108,6 +146,16 @@ public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfor
         else
         {
             // Error. File does not exist.
+            success = false;
+            errorString = "Input does not exist.";
+        }
+
+        if (!success && !string.IsNullOrEmpty(errorString))
+        {
+            BuildNotificationList.instance.AddNotification(new BuildNotification(
+                BuildNotification.Category.Error,
+                "Folder Delete Failed.", errorString,
+                true, null));
         }
     }
 }

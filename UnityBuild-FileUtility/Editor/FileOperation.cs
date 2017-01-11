@@ -19,12 +19,11 @@ public class FileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformA
     public string inputPath;
     [FilePath(false)]
     public string outputPath;
+    public bool recursiveSearch = true;
     public Operation operation;
 
     public override void Execute()
     {
-        //bool containsWildcard = Path.GetFileNameWithoutExtension(inputPath).Contains("*");
-
         switch (operation)
         {
             case Operation.Copy:
@@ -37,12 +36,12 @@ public class FileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformA
                 Delete(inputPath);
                 break;
         }
+
+        AssetDatabase.Refresh();
     }
 
     public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
     {
-        //bool containsWildcard = Path.GetFileNameWithoutExtension(inputPath).Contains("*");
-
         string resolvedInputPath = BuildProject.ResolvePath(inputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
         string resolvedOutputPath = BuildProject.ResolvePath(outputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
 
@@ -58,11 +57,19 @@ public class FileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformA
                 Delete(resolvedInputPath);
                 break;
         }
+
+        AssetDatabase.Refresh();
     }
 
     protected override void DrawProperties(SerializedObject obj)
     {
+        bool containsWildcard = Path.GetFileNameWithoutExtension(inputPath).Contains("*");
+
         EditorGUILayout.PropertyField(obj.FindProperty("operation"));
+
+        if (containsWildcard)
+            EditorGUILayout.PropertyField(obj.FindProperty("recursiveSearch"));
+
         EditorGUILayout.PropertyField(obj.FindProperty("inputPath"));
 
         if (operation != Operation.Delete)
@@ -71,43 +78,105 @@ public class FileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformA
 
     private void Move(string inputPath, string outputPath, bool overwrite = true)
     {
-        if (!File.Exists(inputPath))
+        bool containsWildcard = Path.GetFileNameWithoutExtension(inputPath).Contains("*");
+
+        if (!containsWildcard && !File.Exists(inputPath))
         {
             // Error. Input does not exist.
             return;
         }
 
-        if (overwrite && File.Exists(outputPath))
+        if (!containsWildcard && overwrite && File.Exists(outputPath))
         {
             // Delete previous output.
             FileUtil.DeleteFileOrDirectory(outputPath);
         }
 
-        FileUtil.MoveFileOrDirectory(inputPath, outputPath);
+        if (containsWildcard)
+        {
+            string inputDirectory = Path.GetDirectoryName(inputPath);
+            string outputDirectory = Path.GetDirectoryName(outputPath);
+
+            SearchOption option = recursiveSearch ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            string[] fileList = Directory.GetFiles(inputDirectory, Path.GetFileName(inputPath), option);
+
+            for (int i = 0; i < fileList.Length; i++)
+            {
+                string fileName = Path.GetFileName(fileList[i]);
+                string outputFile = Path.Combine(outputDirectory, fileName);
+
+                if (File.Exists(outputFile))
+                    FileUtil.DeleteFileOrDirectory(outputFile);
+
+                FileUtil.MoveFileOrDirectory(fileList[i], outputFile);
+            }
+        }
+        else
+        {
+            FileUtil.MoveFileOrDirectory(inputPath, outputPath);
+        }
     }
 
     private void Copy(string inputPath, string outputPath, bool overwrite = true)
     {
-        if (!File.Exists(inputPath))
+        bool containsWildcard = Path.GetFileNameWithoutExtension(inputPath).Contains("*");
+
+        if (!containsWildcard && !File.Exists(inputPath))
         {
             // Error. Input does not exist.
             return;
         }
 
-        if (overwrite && File.Exists(outputPath))
+        if (!containsWildcard && overwrite && File.Exists(outputPath))
         {
             // Delete previous output.
             FileUtil.DeleteFileOrDirectory(outputPath);
         }
 
-        FileUtil.CopyFileOrDirectory(inputPath, outputPath);
+        if (containsWildcard)
+        {
+            string inputDirectory = Path.GetDirectoryName(inputPath);
+            string outputDirectory = Path.GetDirectoryName(outputPath);
+
+            SearchOption option = recursiveSearch ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            string[] fileList = Directory.GetFiles(inputDirectory, Path.GetFileName(inputPath), option);
+
+            for (int i = 0; i < fileList.Length; i++)
+            {
+                string fileName = Path.GetFileName(fileList[i]);
+                string outputFile = Path.Combine(outputDirectory, fileName);
+
+                if (File.Exists(outputFile))
+                    FileUtil.DeleteFileOrDirectory(outputFile);
+
+                FileUtil.CopyFileOrDirectory(fileList[i], outputFile);
+            }
+        }
+        else
+        {
+            FileUtil.CopyFileOrDirectory(inputPath, outputPath);
+        }
     }
 
     private void Delete(string inputPath)
     {
-        if (File.Exists(inputPath))
+        bool containsWildcard = Path.GetFileNameWithoutExtension(inputPath).Contains("*");
+
+        if (!containsWildcard && File.Exists(inputPath))
         {
             FileUtil.DeleteFileOrDirectory(inputPath);
+        }
+        else if (containsWildcard)
+        {
+            string inputDirectory = Path.GetDirectoryName(inputPath);
+
+            SearchOption option = recursiveSearch ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            string[] fileList = Directory.GetFiles(inputDirectory, Path.GetFileName(inputPath), option);
+
+            for (int i = 0; i < fileList.Length; i++)
+            {
+                FileUtil.DeleteFileOrDirectory(fileList[i]);
+            }
         }
         else
         {
