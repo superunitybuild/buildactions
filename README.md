@@ -10,17 +10,17 @@ This repository is intended to serve as an ever expanding library of useful Buil
 If you don't already have SuperUnityBuild, get it from its [GitHub repository][unitybuild]. Then, do one of the following:
 
 * [Download][download] this project and copy the folder for the tools you want into your project's Assets directory.
-* Make this repository a git submodlue within your project's Assets directory.
+* Make this repository a git submodule within your project's Assets directory.
 
 Refer to the [SuperUnityBuild wiki][unitybuild-wiki] for basic information on how to setup, use, and create your own BuildActions. For specific details on one of the BuildActions featured here, refer to the README in its directory.
 
 ## Tools
 
-* [**AssetBundle Builder**][assetbundle] - AssetBundle building and file management. Includes functionality to generate AssetBundles outside of the overall build procedure.
-* [**Batch File Runner**][] - Run batch files or other external applications.
+* [**AssetBundle Builder**][assetbundle] - AssetBundle building and file management.
+* [**Script Runner**][scriptrunner] - Run batch/script files or other external applications.
 * [**Zip File Utility**][zipfile] - Compress builds and other files into ZIP file format.
-* [**File Operations Utility**][] - Perform basic file operations like copy, move, and delete.
-* [**itch.io Butler Upload**][itchuploader] - Upload builds to itch.io using their [Butler](https://github.com/itchio/butler) utility.
+* [**File Operations Utility**][fileutil] - Perform basic file/folder operations like copy, move, and delete.
+* [**itch.io Uploader**][itchuploader] - Upload builds to itch.io using their [Butler](https://github.com/itchio/butler) utility.
 
 ## Contributing
 Bug reports, feature requests, and pull requests are welcome and appreciated.
@@ -42,5 +42,7 @@ Zip File Utility includes a pre-compiled DotNetZip library which is licensed und
 [unitybuild-wiki]: https://github.com/Chaser324/unity-build/wiki/Build-Actions
 
 [assetbundle]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-AssetBundle
+[fileutil]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-FileUtility
+[scriptrunner]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-ScriptRunner
 [zipfile]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-ZipFile
 [itchuploader]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-ItchUploader
