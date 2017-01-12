@@ -16,9 +16,9 @@ public sealed class BuildAssetBundles : BuildAction, IPreBuildPerPlatformAction
     public string innerBuildPath = Path.Combine("$PLATFORM", "$ARCHITECTURE");
 
 #if UNITY_5_3 || UNITY_5_4_OR_NEWER
-    BuildAssetBundleOptions options = BuildAssetBundleOptions.ChunkBasedCompression;
+    public BuildAssetBundleOptions options = BuildAssetBundleOptions.ChunkBasedCompression;
 #else
-    BuildAssetBundleOptions options = BuildAssetBundleOptions.None;
+    public BuildAssetBundleOptions options = BuildAssetBundleOptions.None;
 #endif
 
     #endregion
@@ -56,7 +56,11 @@ public sealed class BuildAssetBundles : BuildAction, IPreBuildPerPlatformAction
     {
         EditorGUILayout.PropertyField(obj.FindProperty("baseBuildPath"));
         EditorGUILayout.PropertyField(obj.FindProperty("innerBuildPath"));
-        options = (BuildAssetBundleOptions)EditorGUILayout.EnumMaskField("Options", options);
+        options = (BuildAssetBundleOptions)((int)(BuildAssetBundleOptions)EditorGUILayout.EnumMaskField("Options", (BuildAssetBundleOptions)((int)(options) << 1)) >> 1);
+        //options = (BuildAssetBundleOptions)EditorGUILayout.EnumMaskField("Options", options);
+
+        //int i = (int)options;
+        //Debug.Log(System.Convert.ToString(i, 2) + ", " + i.ToString());
 
         if (GUILayout.Button("Run Now", GUILayout.ExpandWidth(true)))
         {
