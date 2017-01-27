@@ -20,12 +20,16 @@ Refer to the [SuperUnityBuild wiki][unitybuild-wiki] for basic information on ho
 * [**Script Runner**][scriptrunner] - Run batch/script files or other external applications.
 * [**Zip File Utility**][zipfile] - Compress builds and other files into ZIP file format.
 * [**File Operations Utility**][fileutil] - Perform basic file/folder operations like copy, move, and delete.
+* [**itch.io Uploader**][itchuploader] - Upload builds to [itch.io](https://itch.io/).
 
 ## Contributing
 Bug reports, feature requests, and pull requests are welcome and appreciated.
 
 ## Credits
 * **Chase Pettit** - [github](https://github.com/Chaser324), [twitter](http://twitter.com/chasepettit)
+
+### Contributers
+* **Tom Allenbaugh** - [github](https://github.com/tallenbaugh), [twitter](http://twitter.com/argembarger)
 
 ## License
 All code in this repository ([unity-build-actions](https://github.com/Chaser324/unity-build-actions)) is made freely available under the MIT license. This essentially means you're free to use it however you like as long as you provide attribution.
