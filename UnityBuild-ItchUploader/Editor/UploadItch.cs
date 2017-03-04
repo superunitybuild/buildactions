@@ -16,10 +16,13 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
     [FilePath(false, true, "Path to butler.exe")]
     public string pathToButlerExe = "";
     public string nameOfItchUser = "";
-    public string nameOfItchGame = "";
+    public string nameOfItchGame = ""; 
     public bool useGeneratedBuildVersion = false;
 
-    [Header("The following field overrides default channel name (the per-build architecture target), and will be applied to all builds. Use with care.")]
+    [Header("Disable to capture error output for debugging.")]
+    public bool showUploadProgress = true;
+
+    [Header("Use with caution. Override applies to all platforms.")]
     public string itchChannelOverride = "";
 
     #region Public Methods
@@ -84,23 +87,53 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
 
     private void RunScript(string scriptPath, string arguments)
     {
+        // Create and start butler process.
         ProcessStartInfo startInfo = new ProcessStartInfo();
         startInfo.FileName = Path.GetFullPath(scriptPath);
-        startInfo.UseShellExecute = true;
-        startInfo.CreateNoWindow = false;
+        startInfo.UseShellExecute = showUploadProgress;
+        startInfo.CreateNoWindow = !showUploadProgress;
+        startInfo.RedirectStandardOutput = !showUploadProgress;
+        startInfo.RedirectStandardError = !showUploadProgress;
 
         if (!string.IsNullOrEmpty(arguments))
             startInfo.Arguments = arguments;
 
         Process proc = Process.Start(startInfo);
+
+        StringBuilder outputText = new StringBuilder();
+        if (!showUploadProgress)
+        {
+            // Capture stdout.
+            proc.OutputDataReceived += (sendingProcess, outputLine) =>
+            {
+                outputText.AppendLine(outputLine.Data);
+            };
+
+            proc.BeginOutputReadLine();
+        }
+
+        // Wait for butler to finish.
         proc.WaitForExit();
 
+        // Display error if one occurred.
         if (proc.ExitCode != 0)
         {
+            string errString;
+            if (showUploadProgress)
+            {
+                errString = "Run w/ ShowUploadProgress disabled to capture debug output to console.";
+            }
+            else
+            {
+                errString = "Check console window for debug output.";
+            }
+
             BuildNotificationList.instance.AddNotification(new BuildNotification(
                 BuildNotification.Category.Error,
-                "Itch Upload Failed.", string.Format("Exit code: {0}", proc.ExitCode),
+                "Itch Upload Failed.", string.Format("Exit code: {0}\n{1}", proc.ExitCode, errString),
                 true, null));
+
+            UnityEngine.Debug.Log("ITCH.IO BUTLER OUTPUT: " + outputText.ToString());
         }
     }
 
