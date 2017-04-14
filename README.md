@@ -21,6 +21,7 @@ Refer to the [SuperUnityBuild wiki][unitybuild-wiki] for basic information on ho
 * [**Zip File Utility**][zipfile] - Compress builds and other files into ZIP file format.
 * [**File Operations Utility**][fileutil] - Perform basic file/folder operations like copy, move, and delete.
 * [**itch.io Uploader**][itchuploader] - Upload builds to [itch.io](https://itch.io/).
+* [**Define Modifier**][overridedefines] - Add/remove script defines.
 
 ## Contributing
 Bug reports, feature requests, and pull requests are welcome and appreciated.
@@ -49,3 +50,4 @@ Zip File Utility includes a pre-compiled DotNetZip library which is licensed und
 [scriptrunner]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-ScriptRunner
 [zipfile]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-ZipFile
 [itchuploader]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-ItchUploader
+[overridedefines]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-OverrideDefines
