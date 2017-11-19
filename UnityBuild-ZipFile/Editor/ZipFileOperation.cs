@@ -1,5 +1,8 @@
 ﻿using Ionic.Zip;
+using System;
 using System.IO;
+using UnityEditor;
+using UnityEngine;
 
 namespace SuperSystems.UnityBuild
 {
@@ -12,7 +15,7 @@ public class ZipFileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfo
 
     public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref UnityEditor.BuildOptions options, string configKey, string buildPath)
     {
-        string resolvedOutputPath = Path.Combine(inputPath.Replace("$BUILDPATH", buildPath), outputFileName);
+        string resolvedOutputPath = Path.Combine(outputPath.Replace("$BUILDPATH", buildPath), outputFileName);
         resolvedOutputPath = BuildProject.ResolvePath(resolvedOutputPath, releaseType, platform, architecture, distribution, buildTime);
 
         string resolvedInputPath = inputPath.Replace("$BUILDPATH", buildPath);
@@ -21,13 +24,21 @@ public class ZipFileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfo
         if (!resolvedOutputPath.EndsWith(".zip"))
             resolvedOutputPath += ".zip";
 
-        PerformZip(resolvedInputPath, resolvedOutputPath);
+        PerformZip(Path.GetFullPath(resolvedInputPath), Path.GetFullPath(resolvedOutputPath));
     }
 
     private void PerformZip(string inputPath, string outputPath)
     {
         try
         {
+            // Make sure that all parent directories in path are already created.
+            string parentPath = Path.GetDirectoryName(outputPath);
+            if (!Directory.Exists(parentPath))
+            {
+                Directory.CreateDirectory(parentPath);
+            }
+
+            // Delete old file if it exists.
             if (File.Exists(outputPath))
                 File.Delete(outputPath);
 
@@ -38,9 +49,9 @@ public class ZipFileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfo
                 zip.Save();
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // TODO: Log error.
+            Debug.LogError(ex.ToString());
         }
     }
 }
