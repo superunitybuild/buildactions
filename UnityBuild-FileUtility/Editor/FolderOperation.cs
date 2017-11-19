@@ -82,6 +82,11 @@ public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfor
             errorString = "Input does not exist.";
         }
 
+        if (!Directory.Exists(outputPath))
+        {
+            Directory.CreateDirectory(outputPath);
+        }
+
         if (overwrite && Directory.Exists(outputPath))
         {
             // Delete previous output.
@@ -112,6 +117,11 @@ public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfor
             // Error. Input does not exist.
             success = false;
             errorString = "Input does not exist.";
+        }
+
+        if (!Directory.Exists(outputPath))
+        {
+            Directory.CreateDirectory(outputPath);
         }
 
         if (success && overwrite && Directory.Exists(outputPath))
