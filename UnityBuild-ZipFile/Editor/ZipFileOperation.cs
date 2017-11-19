@@ -1,5 +1,7 @@
 ﻿using Ionic.Zip;
 using System.IO;
+using UnityEditor;
+using UnityEngine;
 
 namespace SuperSystems.UnityBuild
 {
