@@ -1,4 +1,5 @@
 ﻿using Ionic.Zip;
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -14,7 +15,11 @@ public class ZipFileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfo
 
     public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref UnityEditor.BuildOptions options, string configKey, string buildPath)
     {
-        string resolvedOutputPath = BuildProject.ResolvePath(outputPath, releaseType, platform, architecture, distribution, buildTime);
+        string resolvedOutputPath = BuildProject.ResolvePath(outputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
+        if (!(resolvedOutputPath.EndsWith(@"\") || resolvedOutputPath.EndsWith("/") ))
+        {
+            resolvedOutputPath += @"\";
+        }
 
         string resolvedOutputFileName = BuildProject.ResolvePath(outputFileName, releaseType, platform, architecture, distribution, buildTime) + ".zip";
 
@@ -38,17 +43,17 @@ public class ZipFileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfo
                 Directory.CreateDirectory(outputPath);
             }
 
-            using (ZipFile zip = new ZipFile(inputPath + ".zip"))
+            using (ZipFile zip = new ZipFile(Path.Combine(outputPath, filename)))
             {
                 zip.ParallelDeflateThreshold = -1; // Parallel deflate is bugged in DotNetZip, so we need to disable it.
                 zip.AddDirectory(inputPath);
                 zip.Save();
             }
-            FileUtil.MoveFileOrDirectory(inputPath + ".zip", outputPath + filename);
+
         }
-            catch
+        catch (Exception ex)
         {
-            // TODO: Log error.
+            Debug.LogError(ex.ToString());
         }
     }
 }
