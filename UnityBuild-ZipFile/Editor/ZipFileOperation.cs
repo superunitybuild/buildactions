@@ -12,33 +12,39 @@ public class ZipFileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfo
 
     public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref UnityEditor.BuildOptions options, string configKey, string buildPath)
     {
-        string resolvedOutputPath = Path.Combine(inputPath.Replace("$BUILDPATH", buildPath), outputFileName);
-        resolvedOutputPath = BuildProject.ResolvePath(resolvedOutputPath, releaseType, platform, architecture, distribution, buildTime);
+        string resolvedOutputPath = BuildProject.ResolvePath(outputPath, releaseType, platform, architecture, distribution, buildTime);
+
+        string resolvedOutputFileName = BuildProject.ResolvePath(outputFileName, releaseType, platform, architecture, distribution, buildTime) + ".zip";
 
         string resolvedInputPath = inputPath.Replace("$BUILDPATH", buildPath);
         resolvedInputPath = BuildProject.ResolvePath(resolvedInputPath, releaseType, platform, architecture, distribution, buildTime);
 
-        if (!resolvedOutputPath.EndsWith(".zip"))
-            resolvedOutputPath += ".zip";
-
-        PerformZip(resolvedInputPath, resolvedOutputPath);
+        PerformZip(resolvedInputPath, resolvedOutputPath, resolvedOutputFileName);
     }
 
-    private void PerformZip(string inputPath, string outputPath)
+    private void PerformZip(string inputPath, string outputPath, string filename)
     {
         try
         {
-            if (File.Exists(outputPath))
-                File.Delete(outputPath);
+            if (File.Exists(outputPath + filename))
+            {
+                File.Delete(outputPath + filename);
+            }
 
-            using (ZipFile zip = new ZipFile(outputPath))
+            if (!Directory.Exists(outputPath))
+            {
+                Directory.CreateDirectory(outputPath);
+            }
+
+            using (ZipFile zip = new ZipFile(inputPath + ".zip"))
             {
                 zip.ParallelDeflateThreshold = -1; // Parallel deflate is bugged in DotNetZip, so we need to disable it.
                 zip.AddDirectory(inputPath);
                 zip.Save();
             }
+            FileUtil.MoveFileOrDirectory(inputPath + ".zip", outputPath + filename);
         }
-        catch
+            catch
         {
             // TODO: Log error.
         }
