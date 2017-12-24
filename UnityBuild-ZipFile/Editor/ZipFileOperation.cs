@@ -31,6 +31,15 @@ public class ZipFileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfo
     {
         try
         {
+            if (!Directory.Exists(inputPath))
+            {
+                BuildNotificationList.instance.AddNotification(new BuildNotification(
+                    BuildNotification.Category.Error,
+                    "Zip Operation Failed.", string.Format("Input path does not exist: {0}", inputPath),
+                    true, null));
+                return;
+            }
+
             // Make sure that all parent directories in path are already created.
             string parentPath = Path.GetDirectoryName(outputPath);
             if (!Directory.Exists(parentPath))
