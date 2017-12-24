@@ -43,9 +43,13 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
 
         switch (architecture.target)
         {
+#if UNITY_2017_3_OR_NEWER
+            case BuildTarget.StandaloneOSX:
+#else
             case BuildTarget.StandaloneOSXIntel:
             case BuildTarget.StandaloneOSXIntel64:
             case BuildTarget.StandaloneOSXUniversal:
+#endif
             case BuildTarget.StandaloneLinux:
             case BuildTarget.StandaloneLinux64:
             case BuildTarget.StandaloneLinuxUniversal:
@@ -156,12 +160,17 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
                 return LINUX + "-universal";
 
             // OSX
+#if UNITY_2017_3_OR_NEWER
+            case BuildTarget.StandaloneOSX:
+                return OSX;
+#else
             case BuildTarget.StandaloneOSXIntel:
                 return OSX + "-intel";
             case BuildTarget.StandaloneOSXIntel64:
                 return OSX + "-intel64";
             case BuildTarget.StandaloneOSXUniversal:
                 return OSX + "-universal";
+#endif
             
             default:
                 return null;

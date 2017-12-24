@@ -56,11 +56,11 @@ public sealed class BuildAssetBundles : BuildAction, IPreBuildPerPlatformAction
     {
         EditorGUILayout.PropertyField(obj.FindProperty("baseBuildPath"));
         EditorGUILayout.PropertyField(obj.FindProperty("innerBuildPath"));
+#if UNITY_2017_3_OR_NEWER
+        options = (BuildAssetBundleOptions)EditorGUILayout.EnumFlagsField("Options", options);
+#else
         options = (BuildAssetBundleOptions)((int)(BuildAssetBundleOptions)EditorGUILayout.EnumMaskField("Options", (BuildAssetBundleOptions)((int)(options) << 1)) >> 1);
-        //options = (BuildAssetBundleOptions)EditorGUILayout.EnumMaskField("Options", options);
-
-        //int i = (int)options;
-        //Debug.Log(System.Convert.ToString(i, 2) + ", " + i.ToString());
+#endif
 
         if (GUILayout.Button("Run Now", GUILayout.ExpandWidth(true)))
         {
