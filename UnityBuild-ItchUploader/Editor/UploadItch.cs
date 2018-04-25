@@ -16,7 +16,7 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
     [FilePath(false, true, "Path to butler.exe")]
     public string pathToButlerExe = "";
     public string nameOfItchUser = "";
-    public string nameOfItchGame = ""; 
+    public string nameOfItchGame = "";
     public bool useGeneratedBuildVersion = false;
 
     [Header("Disable to capture error output for debugging.")]
@@ -24,6 +24,8 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
 
     [Header("Use with caution. Override applies to all platforms.")]
     public string itchChannelOverride = "";
+
+    public bool addReleaseToChannel = false;
 
     #region Public Methods
 
@@ -73,6 +75,10 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
         else
         {
             string itchChannel = GetChannelName(architecture.target);
+            if (addReleaseToChannel && !string.IsNullOrEmpty(releaseType.typeName)) {
+                itchChannel += "-" + releaseType.typeName.ToLower().Replace(' ', '-');
+            }
+            
             if(string.IsNullOrEmpty(itchChannel))
             {
                 UnityEngine.Debug.LogWarning("UploadItch: The current BuildTarget doesn't appear to be a standard Itch.IO build target.");
@@ -171,7 +177,7 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
             case BuildTarget.StandaloneOSXUniversal:
                 return OSX + "-universal";
 #endif
-            
+
             default:
                 return null;
         }
