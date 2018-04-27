@@ -25,7 +25,7 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
     [Header("Use with caution. Override applies to all platforms.")]
     public string itchChannelOverride = "";
 
-    public bool addReleaseToChannel = false;
+    public bool addReleaseTypeToChannel = false;
 
     #region Public Methods
 
@@ -75,10 +75,10 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
         else
         {
             string itchChannel = GetChannelName(architecture.target);
-            if (addReleaseToChannel && !string.IsNullOrEmpty(releaseType.typeName)) {
+            if (addReleaseTypeToChannel && !string.IsNullOrEmpty(releaseType.typeName)) {
                 itchChannel += "-" + releaseType.typeName.ToLower().Replace(' ', '-');
             }
-            
+
             if(string.IsNullOrEmpty(itchChannel))
             {
                 UnityEngine.Debug.LogWarning("UploadItch: The current BuildTarget doesn't appear to be a standard Itch.IO build target.");
