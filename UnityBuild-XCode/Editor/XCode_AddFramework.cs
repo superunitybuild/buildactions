@@ -17,7 +17,7 @@ namespace SuperSystems.UnityBuild
             string projectPath = PBXProject.GetPBXProjectPath(buildPath);
             PBXProject project = new PBXProject();
             project.ReadFromFile(projectPath);
-            project.AddFrameworkToProject(project.TargetGuidByName(targetName), frameworkName + ".framework", weak);
+            project.AddFrameworkToProject(project.TargetGuidByName(targetName), frameworkName, weak);
             project.WriteToFile(projectPath);
         }
     }
