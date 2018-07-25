@@ -6,10 +6,10 @@ using UnityEngine;
 
 namespace SuperSystems.UnityBuild
 {
-    public class XCode_AddFramework : BuildAction, IPostProcessPerPlatformAction
+    public class XCode_AddFrameworks : BuildAction, IPostProcessPerPlatformAction
     {
         [SerializeField] private string targetName = "Unity-iPhone";
-        [SerializeField] private string frameworkName;
+        [SerializeField] private string[] frameworks;
         [SerializeField] private bool weak;
 
         public override void PostProcessExecute(BuildTarget buildTarget, string buildPath)
@@ -17,7 +17,12 @@ namespace SuperSystems.UnityBuild
             string projectPath = PBXProject.GetPBXProjectPath(buildPath);
             PBXProject project = new PBXProject();
             project.ReadFromFile(projectPath);
-            project.AddFrameworkToProject(project.TargetGuidByName(targetName), frameworkName, weak);
+
+            foreach (string framework in frameworks)
+            {
+                project.AddFrameworkToProject(project.TargetGuidByName(targetName), framework, weak);
+            }
+
             project.WriteToFile(projectPath);
         }
     }
