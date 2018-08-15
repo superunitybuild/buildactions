@@ -11,7 +11,7 @@ namespace DefaultNamespace
         {
             if (platform.targetGroup == BuildTargetGroup.iOS)
             {
-                PlayerSettings.iOS.buildNumber += PlayerSettings.iOS.buildNumber + 1;
+                PlayerSettings.iOS.buildNumber = PlayerSettings.iOS.buildNumber + 1;
             }
         }
     }
