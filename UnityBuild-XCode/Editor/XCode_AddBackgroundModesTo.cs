@@ -7,12 +7,12 @@ using UnityEngine;
 
 namespace SuperSystems.UnityBuild
 {
-    public class XCode_AddBackgroundModesTo : BuildAction, IPostProcessPerPlatformAction
+    public class XCode_AddBackgroundModesTo : XCode_Action
     {
         [SerializeField] private string entitlementsPath = "Unity-iPhone/Unity-iPhone.entitlements";
         [SerializeField] private BackgroundModesOptions[] modes;
 
-        public override void PostProcessExecute(BuildTarget buildTarget, string buildPath)
+        protected override void Process(BuildTarget buildTarget, string buildPath)
         {
             ProjectCapabilityManager capabilities =
                 new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(buildPath), entitlementsPath,

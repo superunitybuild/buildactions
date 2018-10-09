@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace SuperSystems.UnityBuild
 {
-    public class XCode_AddStringElementToPList : BuildAction, IPostProcessPerPlatformAction
+    public class XCode_AddStringElementToPList : XCode_Action
     {
         [SerializeField] private string key;
         [SerializeField] private string value;
         
-        public override void PostProcessExecute(BuildTarget target, string buildPath)
+        protected override void Process(BuildTarget target, string buildPath)
         {
             string filePath = Path.Combine(buildPath, "Info.plist");
             PlistDocument pList = new PlistDocument();

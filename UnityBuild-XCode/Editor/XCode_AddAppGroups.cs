@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace SuperSystems.UnityBuild
 {
-    public class XCode_AddAppGroups : BuildAction, IPostProcessPerPlatformAction
+    public class XCode_AddAppGroups : XCode_Action
     {
         [SerializeField] private string entitlementsPath = "Unity-iPhone/Unity-iPhone.entitlements";
         [SerializeField] private string[] appGroups;
 
-        public override void PostProcessExecute(BuildTarget buildTarget, string buildPath)
+        protected override void Process(BuildTarget buildTarget, string buildPath)
         {
             string entitlementPath = buildPath + entitlementsPath; //Path.Combine(buildPath, entitlementsPath);
             
@@ -32,12 +32,6 @@ namespace SuperSystems.UnityBuild
             }
             
             entitlements.WriteToFile(entitlementPath);
-            
-//            ProjectCapabilityManager capabilities =
-//                new ProjectCapabilityManager(PBXProject.GetPBXProjectPath(buildPath),
-//                    entitlementsPath, PBXProject.GetUnityTargetName());
-//            capabilities.AddAppGroups(appGroups);
-//            capabilities.WriteToFile();
         }
     }
 }
