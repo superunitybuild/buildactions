@@ -6,13 +6,13 @@ using UnityEngine;
 
 namespace SuperSystems.UnityBuild
 {
-    public class XCode_AddFrameworks : BuildAction, IPostProcessPerPlatformAction
+    public class XCode_AddFrameworks : XCode_Action
     {
         [SerializeField] private string targetName = "Unity-iPhone";
         [SerializeField] private string[] frameworks;
         [SerializeField] private bool weak;
 
-        public override void PostProcessExecute(BuildTarget buildTarget, string buildPath)
+        protected override void Process(BuildTarget buildTarget, string buildPath)
         {
             string projectPath = PBXProject.GetPBXProjectPath(buildPath);
             PBXProject project = new PBXProject();

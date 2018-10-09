@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SuperSystems.UnityBuild
 {
-    public class XCode_EnableCapabilities : BuildAction, IPostProcessPerPlatformAction
+    public class XCode_EnableCapabilities : XCode_Action
     {
         public enum Capability
         {
@@ -22,7 +22,7 @@ namespace SuperSystems.UnityBuild
         [SerializeField] private string entitlementsPath = "Unity-iPhone/Unity-iPhone.entitlements";
         [SerializeField] private Capability[] capabilities;
 
-        public override void PostProcessExecute(BuildTarget buildTarget, string buildPath)
+        protected override void Process(BuildTarget buildTarget, string buildPath)
         {
             PBXProject project = new PBXProject();
             string projectPath = PBXProject.GetPBXProjectPath(buildPath);
