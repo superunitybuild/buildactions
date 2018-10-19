@@ -21,7 +21,7 @@ namespace SuperSystems.UnityBuild
         public override void PostProcessExecute(BuildTarget buildTarget, string buildPath)
         {
 #if UNITY_IOS
-            Process();
+            Process(buildTarget,buildPath);
 #endif
         }
 
