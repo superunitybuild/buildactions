@@ -14,11 +14,20 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
     private const string LINUX = "linux";
     private const string WEBGL = "webgl";
 
+    private const string ARCHITECTURE_X86 = "x86";
+    private const string ARCHITECTURE_X64 = "x64";
+    private const string ARCHITECTURE_INTEL = "intel";
+    private const string ARCHITECTURE_INTEL64 = "intel64";
+    private const string ARCHITECTURE_UNIVERSAL = "universal";
+
     [FilePath(false, true, "Path to butler.exe")]
     public string pathToButlerExe = "";
     public string nameOfItchUser = "";
     public string nameOfItchGame = ""; 
     public bool useGeneratedBuildVersion = false;
+
+    [Header("Format channel name")]
+    public string channelName = "$PLATFORM-$ARCHITECTURE";
 
     [Header("Disable to capture error output for debugging.")]
     public bool showUploadProgress = true;
@@ -73,7 +82,7 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
         }
         else
         {
-            string itchChannel = GetChannelName(architecture.target);
+            string itchChannel = GetChannelName(channelName, architecture.target, releaseType);
             if(string.IsNullOrEmpty(itchChannel))
             {
                 UnityEngine.Debug.LogWarning("UploadItch: The current BuildTarget doesn't appear to be a standard Itch.IO build target.");
@@ -142,44 +151,71 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
         }
     }
 
-    private static string GetChannelName(BuildTarget target)
+    private static string GetChannelName(string channelNameFormat, BuildTarget target, BuildReleaseType buildReleaseType)
     {
+        string platform = string.Empty;
+        string architecture = string.Empty;
         switch (target)
         {
             // Windows
             case BuildTarget.StandaloneWindows:
-                return WINDOWS + "-x86";
+                platform = WINDOWS;
+                architecture = ARCHITECTURE_X86;
+                break;
             case BuildTarget.StandaloneWindows64:
-                return WINDOWS + "-x64";
+                platform = WINDOWS;
+                architecture = ARCHITECTURE_X64;
+                break;
 
             // Linux
             case BuildTarget.StandaloneLinux:
-                return LINUX + "-x86";
+                platform = LINUX;
+                architecture = ARCHITECTURE_X86;
+                break;
             case BuildTarget.StandaloneLinux64:
-                return LINUX + "-x64";
+                platform = LINUX;
+                architecture = ARCHITECTURE_X64;
+                break;
             case BuildTarget.StandaloneLinuxUniversal:
-                return LINUX + "-universal";
+                platform = LINUX;
+                architecture = ARCHITECTURE_UNIVERSAL;
+                break;
 
             // OSX
 #if UNITY_2017_3_OR_NEWER
             case BuildTarget.StandaloneOSX:
-                return OSX;
+                platform = OSX;
+                break;
 #else
             case BuildTarget.StandaloneOSXIntel:
-                return OSX + "-intel";
+                platform = OSX;
+                architecture = ARCHITECTURE_INTEL;
+                break;
             case BuildTarget.StandaloneOSXIntel64:
-                return OSX + "-intel64";
+                platform = OSX;
+                architecture = ARCHITECTURE_INTEL64;
+                break;
             case BuildTarget.StandaloneOSXUniversal:
-                return OSX + "-universal";
+                platform = OSX;
+                architecture = ARCHITECTURE_UNIVERSAL;
+                break;
 #endif
             
             // WebGL
             case BuildTarget.WebGL:
-                return WEBGL;
+                platform = WEBGL;
+                break;
             
             default:
                 return null;
         }
+
+        string channelName = channelNameFormat;
+        channelName = channelName.Replace("$PLATFORM", platform);
+        channelName = channelName.Replace("$ARCHITECTURE", architecture);
+        channelName = channelName.Replace("$RELEASE_TYPE", buildReleaseType.typeName);
+        
+        return channelName;
     }
 
     #endregion
