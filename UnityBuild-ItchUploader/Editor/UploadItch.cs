@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using UnityEditor;
@@ -12,6 +12,7 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
     private const string WINDOWS = "windows";
     private const string OSX = "osx";
     private const string LINUX = "linux";
+    private const string WEBGL = "webgl";
 
     [FilePath(false, true, "Path to butler.exe")]
     public string pathToButlerExe = "";
@@ -171,6 +172,10 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
             case BuildTarget.StandaloneOSXUniversal:
                 return OSX + "-universal";
 #endif
+            
+            // WebGL
+            case BuildTarget.WebGL:
+                return WEBGL;
             
             default:
                 return null;
