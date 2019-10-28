@@ -35,6 +35,8 @@ namespace SuperSystems.UnityBuild
         public List<SDK> Sdks = new List<SDK>();
         [Tooltip("Whether or not build target supports VR")]
         public bool VRSupported;
+        [Tooltip("Stereo rendering mode to use")]
+        public StereoRenderingPath StereoRenderingMode;
 
         [Header("Platform-Specific Settings")]
         [Tooltip("Whether or not build target supports ARCore (Android only)")]
@@ -61,6 +63,7 @@ namespace SuperSystems.UnityBuild
             // Update player settings
             PlayerSettings.SetVirtualRealitySupported(platform.targetGroup, VRSupported);
             PlayerSettings.SetVirtualRealitySDKs(platform.targetGroup, sdks.ToArray());
+            PlayerSettings.stereoRenderingPath = StereoRenderingMode;
 
             if (platform.targetGroup == BuildTargetGroup.Android)
             {
@@ -68,5 +71,4 @@ namespace SuperSystems.UnityBuild
             }
         }
     }
-
 }
