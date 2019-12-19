@@ -14,8 +14,10 @@ public class OverrideDefines : BuildAction, IPreBuildPerPlatformAction
 
     public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
     {
-        StringBuilder defines = new StringBuilder(BuildProject.GenerateDefaultDefines(releaseType, platform, architecture, distribution));
-        
+        string preBuildDefines = PlayerSettings.GetScriptingDefineSymbolsForGroup(platform.targetGroup);
+        string defaultDefines = BuildProject.GenerateDefaultDefines(releaseType, platform, architecture, distribution);
+
+        StringBuilder mergedDefines = new StringBuilder(BuildProject.MergeDefines(preBuildDefines,defaultDefines));
         if (!string.IsNullOrEmpty(removeDefines))
         {
             string resolvedRemove = BuildProject.ResolvePath(removeDefines, releaseType, platform, architecture, distribution, buildTime);
@@ -23,8 +25,8 @@ public class OverrideDefines : BuildAction, IPreBuildPerPlatformAction
 
             for (int i = 0; i < splitRemove.Length; i++)
             {
-                defines.Replace(splitRemove[i] + ";", "");
-                defines.Replace(splitRemove[i], "");
+                mergedDefines.Replace(splitRemove[i] + ";", "");
+                mergedDefines.Replace(splitRemove[i], "");
             }
         }
 
@@ -32,13 +34,13 @@ public class OverrideDefines : BuildAction, IPreBuildPerPlatformAction
         {
             string resolvedAdd = BuildProject.ResolvePath(addDefines, releaseType, platform, architecture, distribution, buildTime);
 
-            if (defines.Length > 0)
-                defines.Append(";" + resolvedAdd);
+            if (mergedDefines.Length > 0)
+                mergedDefines.Append(";" + resolvedAdd);
             else
-                defines.Append(resolvedAdd);
+                mergedDefines.Append(resolvedAdd);
         }
 
-        PlayerSettings.SetScriptingDefineSymbolsForGroup(platform.targetGroup, defines.ToString());
+        PlayerSettings.SetScriptingDefineSymbolsForGroup(platform.targetGroup, mergedDefines.ToString());
     }
 }
 
