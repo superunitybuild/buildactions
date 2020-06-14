@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System;
 using System.Collections;
 using System.IO;
 
@@ -42,8 +43,8 @@ public class FileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformA
 
     public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
     {
-        string resolvedInputPath = BuildProject.ResolvePath(inputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
-        string resolvedOutputPath = BuildProject.ResolvePath(outputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
+        string resolvedInputPath = FolderOperation.ResolvePath(inputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
+        string resolvedOutputPath = FolderOperation.ResolvePath(outputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
 
         switch (operation)
         {

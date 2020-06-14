@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System;
 using System.Collections;
 using System.IO;
 using System.Diagnostics;
@@ -40,10 +41,17 @@ public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfor
         AssetDatabase.Refresh();
     }
 
+    public static string ResolvePath(string prototype, BuildReleaseType releaseType, BuildPlatform buildPlatform, BuildArchitecture arch, BuildDistribution dist, DateTime buildTime, string buildPath)
+    {
+        return BuildProject.ResolvePath(
+            prototype.Replace("$BUILDPATH", buildPath).Replace("$BASEPATH", BuildSettings.basicSettings.baseBuildFolder),
+            releaseType, buildPlatform, arch, dist, buildTime);
+    }
+
     public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
     {
-        string resolvedInputPath = BuildProject.ResolvePath(inputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
-        string resolvedOutputPath = BuildProject.ResolvePath(outputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
+        string resolvedInputPath = ResolvePath(inputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
+        string resolvedOutputPath = ResolvePath(outputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
 
         switch (operation)
         {
@@ -118,7 +126,7 @@ public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfor
         {
             // Error. Input does not exist.
             success = false;
-            errorString = "Input does not exist.";
+            errorString = $"Input \"{inputPath}\" does not exist.";
         }
 
         // Make sure that all parent directories in path are already created.
@@ -134,10 +142,11 @@ public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatfor
             success = FileUtil.DeleteFileOrDirectory(outputPath);
 
             if (!success)
-                errorString = "Could not overwrite existing folder.";
+                errorString = $"Could not overwrite existing folder \"{outputPath}\".";
         }
 
-        FileUtil.CopyFileOrDirectory(inputPath, outputPath);
+        if (success)
+            FileUtil.CopyFileOrDirectory(inputPath, outputPath);
 
         if (!success && !string.IsNullOrEmpty(errorString))
         {
