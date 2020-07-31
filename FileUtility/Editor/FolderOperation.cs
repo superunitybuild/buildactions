@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Diagnostics;
-using System.IO;
+﻿
 using SuperUnityBuild.BuildTool;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,16 +24,20 @@ namespace SuperUnityBuild.BuildActions
 
         public override void Execute()
         {
+            string version = BuildSettings.productParameters.lastGeneratedVersion;
+            string resolvedInputPath = ReplaceVersion(inputPath, version);
+            string resolvedOutputPath = ReplaceVersion(outputPath, version);
+
             switch (operation)
             {
                 case Operation.Copy:
-                    Copy(inputPath, outputPath);
+                    Copy(resolvedInputPath, resolvedOutputPath);
                     break;
                 case Operation.Move:
-                    Move(inputPath, outputPath);
+                    Move(resolvedInputPath, resolvedOutputPath);
                     break;
                 case Operation.Delete:
-                    Delete(inputPath);
+                    Delete(resolvedInputPath);
                     break;
             }
 
@@ -43,8 +46,12 @@ namespace SuperUnityBuild.BuildActions
 
         public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
-            string resolvedInputPath = BuildProject.ResolvePath(inputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
-            string resolvedOutputPath = BuildProject.ResolvePath(outputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
+            string version = BuildSettings.productParameters.lastGeneratedVersion;
+            string resolvedInputPath = ReplaceVersion(inputPath, version);
+            string resolvedOutputPath = ReplaceVersion(outputPath, version);
+
+            resolvedInputPath = BuildProject.ResolvePath(resolvedInputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
+            resolvedOutputPath = BuildProject.ResolvePath(resolvedOutputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
 
             switch (operation)
             {
@@ -69,6 +76,11 @@ namespace SuperUnityBuild.BuildActions
 
             if (operation != Operation.Delete)
                 EditorGUILayout.PropertyField(obj.FindProperty("outputPath"));
+        }
+
+        private string ReplaceVersion(string path, string version)
+        {
+            return path.Replace("$VERSION", version);
         }
 
         private void Move(string inputPath, string outputPath, bool overwrite = true)
@@ -174,5 +186,4 @@ namespace SuperUnityBuild.BuildActions
             }
         }
     }
-
 }
