@@ -1,3 +1,7 @@
+#if UNITY_2017_4 || UNITY_2018_4 || UNITY_2019_2_OR_NEWER
+#define SUPPORTS_OCULUS_V2_SIGNING
+#endif
+
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -38,8 +42,14 @@ namespace SuperSystems.UnityBuild
         [Tooltip("Stereo rendering mode to use")]
         public StereoRenderingPath StereoRenderingMode;
 
+#if SUPPORTS_OCULUS_V2_SIGNING
+        [Header("SDK-Specific Settings")]
+        [Tooltip("Oculus: Whether or not to use v2 APK signing (enable for Quest, disable for Gear VR/Go)")]
+        public bool OculusV2Signing = true;
+#endif
+
         [Header("Platform-Specific Settings")]
-        [Tooltip("Whether or not build target supports ARCore (Android only)")]
+        [Tooltip("Android: Whether or not build target supports ARCore")]
         public bool ARCoreSupported;
 
         public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
@@ -64,6 +74,10 @@ namespace SuperSystems.UnityBuild
             PlayerSettings.SetVirtualRealitySupported(platform.targetGroup, VRSupported);
             PlayerSettings.SetVirtualRealitySDKs(platform.targetGroup, sdks.ToArray());
             PlayerSettings.stereoRenderingPath = StereoRenderingMode;
+
+#if SUPPORTS_OCULUS_V2_SIGNING
+            PlayerSettings.VROculus.v2Signing = OculusV2Signing;
+#endif
 
             if (platform.targetGroup == BuildTargetGroup.Android)
             {
