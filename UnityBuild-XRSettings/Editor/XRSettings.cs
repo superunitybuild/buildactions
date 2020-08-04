@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SuperSystems.UnityBuild
 {
-    public class XRSettings : BuildAction, IPreBuildPerPlatformAction
+    public class XRSettings : BuildAction, IPreBuildPerPlatformAction, IPostBuildPerPlatformAction
     {
         public enum SDK
         {
