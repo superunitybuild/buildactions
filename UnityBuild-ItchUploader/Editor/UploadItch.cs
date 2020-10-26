@@ -12,6 +12,7 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
     private const string WINDOWS = "windows";
     private const string OSX = "osx";
     private const string LINUX = "linux";
+    private const string ANDROID = "android";
 
     [FilePath(false, true, "Path to butler.exe")]
     public string pathToButlerExe = "";
@@ -171,6 +172,9 @@ public class UploadItch : BuildAction, IPostBuildPerPlatformAction
             case BuildTarget.StandaloneOSXUniversal:
                 return OSX + "-universal";
 #endif
+            // Android
+            case BuildTarget.Android:
+                return ANDROID;
             
             default:
                 return null;
