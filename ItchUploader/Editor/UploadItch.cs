@@ -52,9 +52,11 @@ namespace SuperUnityBuild.BuildActions
             case BuildTarget.StandaloneOSXIntel64:
             case BuildTarget.StandaloneOSXUniversal:
 #endif
+#if !UNITY_2019_2_OR_NEWER
                 case BuildTarget.StandaloneLinux:
-                case BuildTarget.StandaloneLinux64:
                 case BuildTarget.StandaloneLinuxUniversal:
+#endif
+                case BuildTarget.StandaloneLinux64:
                     // Fix exe permissions for Linux/OSX.
                     scriptArguments.Append("--fix-permissions ");
                     break;
@@ -154,12 +156,14 @@ namespace SuperUnityBuild.BuildActions
                     return WINDOWS + "-x64";
 
                 // Linux
+#if !UNITY_2019_2_OR_NEWER
                 case BuildTarget.StandaloneLinux:
                     return LINUX + "-x86";
-                case BuildTarget.StandaloneLinux64:
-                    return LINUX + "-x64";
                 case BuildTarget.StandaloneLinuxUniversal:
                     return LINUX + "-universal";
+#endif
+                case BuildTarget.StandaloneLinux64:
+                    return LINUX + "-x64";
 
                 // OSX
 #if UNITY_2017_3_OR_NEWER
