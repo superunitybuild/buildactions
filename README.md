@@ -1,13 +1,13 @@
 # SuperUnityBuild - BuildActions
-> BuildActions for use with the [SuperUnityBuild][unitybuild] build automation tool.
+> BuildActions for use with the [SuperUnityBuild][buildtool] build automation tool.
 
-BuildActions are one of the key components that make the [SuperUnityBuild][unitybuild] build automation tool flexible and powerful. Each one extends the capabilities of SuperUnityBuild and can be easily setup and customized to suit your needs, and if there's some other specialized functionality that your project needs, you can simply write your own BuildActions and integrate them into the build process.
+BuildActions are one of the key components that make the [SuperUnityBuild][buildtool] build automation tool flexible and powerful. Each one extends the capabilities of SuperUnityBuild and can be easily setup and customized to suit your needs, and if there's some other specialized functionality that your project needs, you can simply write your own BuildActions and integrate them into the build process.
 
 This repository is intended to serve as an ever expanding library of useful BuildActions as more of them are created.
 
 ## Basic Usage
 
-If you don't already have SuperUnityBuild, get it from its [GitHub repository][unitybuild]. Then, do one of the following:
+If you don't already have SuperUnityBuild, get it from its [GitHub repository][buildtool]. Then, do one of the following:
 
 * [Download][download] this project and copy the folder for the tools you want into your project's Assets directory.
 * Make this repository a git submodule within your project's Assets directory.
@@ -30,7 +30,7 @@ Bug reports, feature requests, and pull requests are welcome and appreciated.
 * **Chase Pettit** - [github](https://github.com/Chaser324), [twitter](http://twitter.com/chasepettit)
 
 ## License
-All code in this repository ([unity-build-actions](https://github.com/Chaser324/unity-build-actions)) is made freely available under the MIT license. This essentially means you're free to use it however you like as long as you provide attribution.
+All code in this repository ([unity-build-actions](https://github.com/superunitybuild/buildactions)) is made freely available under the MIT license. This essentially means you're free to use it however you like as long as you provide attribution.
 
 Zip File Utility includes a pre-compiled DotNetZip library which is licensed under the Ms-PL. See [DotNetZip's repository](https://dotnetzip.codeplex.com/) for more info.
 
@@ -38,13 +38,13 @@ Zip File Utility includes a pre-compiled DotNetZip library which is licensed und
 
 
 
-[download]: https://github.com/Chaser324/unity-build-actions/archive/master.zip
-[unitybuild]: https://github.com/Chaser324/unity-build
+[download]: https://github.com/superunitybuild/buildactions/archive/master.zip
+[buildtool]: https://github.com/Chaser324/unity-build
 [unitybuild-wiki]: https://github.com/Chaser324/unity-build/wiki/Build-Actions
 
-[assetbundle]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-AssetBundle
-[fileutil]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-FileUtility
-[scriptrunner]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-ScriptRunner
-[zipfile]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-ZipFile
-[itchuploader]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-ItchUploader
-[overridedefines]: https://github.com/Chaser324/unity-build-actions/tree/master/UnityBuild-OverrideDefines
+[assetbundle]: https://github.com/superunitybuild/buildactions/tree/master/UnityBuild-AssetBundle
+[fileutil]: https://github.com/superunitybuild/buildactions/tree/master/UnityBuild-FileUtility
+[scriptrunner]: https://github.com/superunitybuild/buildactions/tree/master/UnityBuild-ScriptRunner
+[zipfile]: https://github.com/superunitybuild/buildactions/tree/master/UnityBuild-ZipFile
+[itchuploader]: https://github.com/superunitybuild/buildactions/tree/master/UnityBuild-ItchUploader
+[overridedefines]: https://github.com/superunitybuild/buildactions/tree/master/UnityBuild-OverrideDefines
