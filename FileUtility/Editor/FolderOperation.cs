@@ -1,13 +1,9 @@
-﻿using System.Collections;
-using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using SuperUnityBuild.BuildTool;
 using UnityEditor;
-using UnityEngine;
 
 namespace SuperUnityBuild.BuildActions
 {
-
     public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction
     {
         public enum Operation
@@ -17,9 +13,9 @@ namespace SuperUnityBuild.BuildActions
             Delete,
         }
 
-        [SuperUnityBuild.BuildTool.FilePath(true)]
+        [BuildTool.FilePath(true)]
         public string inputPath;
-        [SuperUnityBuild.BuildTool.FilePath(true)]
+        [BuildTool.FilePath(true)]
         public string outputPath;
         public Operation operation;
 
@@ -174,5 +170,4 @@ namespace SuperUnityBuild.BuildActions
             }
         }
     }
-
 }

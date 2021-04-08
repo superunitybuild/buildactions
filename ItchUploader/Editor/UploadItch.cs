@@ -7,7 +7,6 @@ using UnityEngine;
 
 namespace SuperUnityBuild.BuildActions
 {
-
     public class UploadItch : BuildAction, IPostBuildPerPlatformAction
     {
         private const string WINDOWS = "windows";
@@ -15,7 +14,7 @@ namespace SuperUnityBuild.BuildActions
         private const string LINUX = "linux";
         private const string ANDROID = "android";
 
-        [SuperUnityBuild.BuildTool.FilePath(false, true, "Path to butler.exe")]
+        [BuildTool.FilePath(false, true, "Path to butler.exe")]
         public string pathToButlerExe = "";
         public string nameOfItchUser = "";
         public string nameOfItchGame = "";
@@ -188,5 +187,4 @@ namespace SuperUnityBuild.BuildActions
 
         #endregion
     }
-
 }

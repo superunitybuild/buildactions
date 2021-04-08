@@ -10,7 +10,7 @@ namespace SuperUnityBuild.BuildActions
     {
         #region Public Variables
 
-        [SuperUnityBuild.BuildTool.FilePath(true, true, "Select AssetBundle output directory.")]
+        [BuildTool.FilePath(true, true, "Select AssetBundle output directory.")]
         public string baseBuildPath = Path.Combine("bin", "bundles");
 
         public string innerBuildPath = Path.Combine("$PLATFORM", "$ARCHITECTURE");

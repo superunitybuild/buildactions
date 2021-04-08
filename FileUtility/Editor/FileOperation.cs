@@ -13,9 +13,9 @@ namespace SuperUnityBuild.BuildActions
             Delete,
         }
 
-        [SuperUnityBuild.BuildTool.FilePath(false)]
+        [BuildTool.FilePath(false)]
         public string inputPath;
-        [SuperUnityBuild.BuildTool.FilePath(false)]
+        [BuildTool.FilePath(false)]
         public string outputPath;
         public bool recursiveSearch = true;
         public Operation operation;

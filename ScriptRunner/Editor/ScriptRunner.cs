@@ -7,7 +7,7 @@ namespace SuperUnityBuild.BuildActions
 {
     public class ScriptRunner : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction
     {
-        [SuperUnityBuild.BuildTool.FilePath(false, true, "Select program/script to run.")]
+        [BuildTool.FilePath(false, true, "Select program/script to run.")]
         public string scriptPath = "";
         public string scriptArguments = "";
 
