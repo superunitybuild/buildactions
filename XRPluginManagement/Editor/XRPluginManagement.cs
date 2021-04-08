@@ -21,7 +21,7 @@ namespace SuperUnityBuild.BuildActions
 
             generalSettings.InitManagerOnStart = InitializeXROnStartup;
 
-            settingsManager.loaders = XRPlugins;
+            settingsManager.TrySetLoaders(XRPlugins);
         }
     }
 }
