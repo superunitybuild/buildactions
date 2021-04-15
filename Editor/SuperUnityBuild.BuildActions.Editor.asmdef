@@ -20,6 +20,11 @@
             "name": "com.unity.xr.management",
             "expression": "",
             "define": "UNITY_XR_MANAGEMENT"
+        },
+        {
+            "name": "com.unity.xr.management",
+            "expression": "4.0.0",
+            "define": "UNITY_XR_MANAGEMENT_400_OR_NEWER"
         }
     ],
     "noEngineReferences": false

@@ -16,5 +16,9 @@ This release includes all [previous commits][1.0.0] to the project, plus:
 -   Added UPM support.
 -   First tagged version.
 
+### Changed
+
+-   Support all versions of Unity XR Plug-in Management in `XRPluginManagement` action.
+
 [unreleased]: https://github.com/superunitybuild/buildactions/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/superunitybuild/buildactions/compare/5951d33...v1.0.0
