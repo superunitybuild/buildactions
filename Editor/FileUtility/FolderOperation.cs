@@ -5,15 +5,10 @@ using UnityEditor;
 
 namespace SuperUnityBuild.BuildActions
 {
+    using Operation = FileUtility.Operation;
+
     public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction
     {
-        public enum Operation
-        {
-            Move,
-            Copy,
-            Delete,
-        }
-
         [BuildTool.FilePath(true)]
         public string inputPath;
         [BuildTool.FilePath(true)]
@@ -22,33 +17,29 @@ namespace SuperUnityBuild.BuildActions
 
         public override void Execute()
         {
+            string resolvedInputPath = FileUtility.ResolvePath(inputPath);
+            string resolvedOutputPath = FileUtility.ResolvePath(outputPath);
+
             switch (operation)
             {
                 case Operation.Copy:
-                    Copy(inputPath, outputPath);
+                    Copy(resolvedInputPath, resolvedOutputPath);
                     break;
                 case Operation.Move:
-                    Move(inputPath, outputPath);
+                    Move(resolvedInputPath, resolvedOutputPath);
                     break;
                 case Operation.Delete:
-                    Delete(inputPath);
+                    Delete(resolvedInputPath);
                     break;
             }
 
             AssetDatabase.Refresh();
         }
 
-        public static string ResolvePath(string prototype, BuildReleaseType releaseType, BuildPlatform buildPlatform, BuildArchitecture arch, BuildDistribution dist, DateTime buildTime, string buildPath)
-        {
-            return BuildProject.ResolvePath(
-                prototype.Replace("$BUILDPATH", buildPath).Replace("$BASEPATH", BuildSettings.basicSettings.baseBuildFolder),
-                releaseType, buildPlatform, arch, dist, buildTime);
-        }
-
         public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
-            string resolvedInputPath = ResolvePath(inputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
-            string resolvedOutputPath = ResolvePath(outputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
+            string resolvedInputPath = FileUtility.ResolvePerBuildPath(inputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
+            string resolvedOutputPath = FileUtility.ResolvePerBuildPath(outputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
 
             switch (operation)
             {
@@ -84,7 +75,7 @@ namespace SuperUnityBuild.BuildActions
             {
                 // Error. Input does not exist.
                 success = false;
-                errorString = "Input does not exist.";
+                errorString = $"Input \"{inputPath}\" does not exist.";
             }
 
             // Make sure that all parent directories in path are already created.
@@ -100,7 +91,7 @@ namespace SuperUnityBuild.BuildActions
                 success = FileUtil.DeleteFileOrDirectory(outputPath);
 
                 if (!success)
-                    errorString = "Could not overwrite existing folder.";
+                    errorString = $"Could not overwrite existing folder \"{outputPath}\".";
             }
 
             FileUtil.MoveFileOrDirectory(inputPath, outputPath);
@@ -161,13 +152,16 @@ namespace SuperUnityBuild.BuildActions
 
             if (Directory.Exists(inputPath))
             {
-                FileUtil.DeleteFileOrDirectory(inputPath);
+                success = FileUtil.DeleteFileOrDirectory(inputPath);
+
+                if (!success)
+                    errorString = $"Could not delete folder \"{inputPath}\".";
             }
             else
             {
-                // Error. File does not exist.
+                // Error. Path does not exist.
                 success = false;
-                errorString = "Input does not exist.";
+                errorString = $"Input \"{inputPath}\" does not exist.";
             }
 
             if (!success && !string.IsNullOrEmpty(errorString))
