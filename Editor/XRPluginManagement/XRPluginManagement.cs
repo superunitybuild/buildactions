@@ -1,6 +1,7 @@
+#if UNITY_XR_MANAGEMENT
+using SuperUnityBuild.BuildTool;
 using System;
 using System.Collections.Generic;
-using SuperUnityBuild.BuildTool;
 using UnityEditor;
 using UnityEditor.XR.Management;
 using UnityEngine;
@@ -25,3 +26,4 @@ namespace SuperUnityBuild.BuildActions
         }
     }
 }
+#endif

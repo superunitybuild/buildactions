@@ -1,0 +1,26 @@
+{
+    "name": "SuperUnityBuild.BuildActions.Editor",
+    "rootNamespace": "SuperUnityBuild.BuildActions",
+    "references": [
+        "GUID:bf7b7d9340660ea4495e1f45f0fc349d",
+        "GUID:e40ba710768534012815d3193fa296cb",
+        "GUID:f9fe0089ec81f4079af78eb2287a6163"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.xr.management",
+            "expression": "",
+            "define": "UNITY_XR_MANAGEMENT"
+        }
+    ],
+    "noEngineReferences": false
+}
