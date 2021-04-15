@@ -1,5 +1,6 @@
-﻿using System.IO;
-using SuperUnityBuild.BuildTool;
+﻿using SuperUnityBuild.BuildTool;
+using System;
+using System.IO;
 using UnityEditor;
 
 namespace SuperUnityBuild.BuildActions
@@ -38,10 +39,10 @@ namespace SuperUnityBuild.BuildActions
             AssetDatabase.Refresh();
         }
 
-        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
+        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
-            string resolvedInputPath = BuildProject.ResolvePath(inputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
-            string resolvedOutputPath = BuildProject.ResolvePath(outputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
+            string resolvedInputPath = FolderOperation.ResolvePath(inputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
+            string resolvedOutputPath = FolderOperation.ResolvePath(outputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
 
             switch (operation)
             {

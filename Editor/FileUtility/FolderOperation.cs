@@ -1,5 +1,6 @@
-﻿using System.IO;
-using SuperUnityBuild.BuildTool;
+﻿using SuperUnityBuild.BuildTool;
+using System;
+using System.IO;
 using UnityEditor;
 
 namespace SuperUnityBuild.BuildActions
@@ -37,10 +38,17 @@ namespace SuperUnityBuild.BuildActions
             AssetDatabase.Refresh();
         }
 
-        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
+        public static string ResolvePath(string prototype, BuildReleaseType releaseType, BuildPlatform buildPlatform, BuildArchitecture arch, BuildDistribution dist, DateTime buildTime, string buildPath)
         {
-            string resolvedInputPath = BuildProject.ResolvePath(inputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
-            string resolvedOutputPath = BuildProject.ResolvePath(outputPath.Replace("$BUILDPATH", buildPath), releaseType, platform, architecture, distribution, buildTime);
+            return BuildProject.ResolvePath(
+                prototype.Replace("$BUILDPATH", buildPath).Replace("$BASEPATH", BuildSettings.basicSettings.baseBuildFolder),
+                releaseType, buildPlatform, arch, dist, buildTime);
+        }
+
+        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
+        {
+            string resolvedInputPath = ResolvePath(inputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
+            string resolvedOutputPath = ResolvePath(outputPath, releaseType, platform, architecture, distribution, buildTime, buildPath);
 
             switch (operation)
             {
@@ -115,7 +123,7 @@ namespace SuperUnityBuild.BuildActions
             {
                 // Error. Input does not exist.
                 success = false;
-                errorString = "Input does not exist.";
+                errorString = $"Input \"{inputPath}\" does not exist.";
             }
 
             // Make sure that all parent directories in path are already created.
@@ -131,10 +139,11 @@ namespace SuperUnityBuild.BuildActions
                 success = FileUtil.DeleteFileOrDirectory(outputPath);
 
                 if (!success)
-                    errorString = "Could not overwrite existing folder.";
+                    errorString = $"Could not overwrite existing folder \"{outputPath}\".";
             }
 
-            FileUtil.CopyFileOrDirectory(inputPath, outputPath);
+            if (success)
+                FileUtil.CopyFileOrDirectory(inputPath, outputPath);
 
             if (!success && !string.IsNullOrEmpty(errorString))
             {
