@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+﻿using SuperUnityBuild.BuildTool;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
-using SuperUnityBuild.BuildTool;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,15 +10,22 @@ namespace SuperUnityBuild.BuildActions
     public class UploadItch : BuildAction, IPostBuildPerPlatformAction
     {
         private const string WINDOWS = "windows";
-        private const string OSX = "osx";
+        private const string OSX = "mac";
         private const string LINUX = "linux";
         private const string ANDROID = "android";
 
-        [BuildTool.FilePath(false, true, "Path to butler.exe")]
+        private const string ARCHITECTURE_X86 = "x86";
+        private const string ARCHITECTURE_X64 = "x64";
+        private const string ARCHITECTURE_UNIVERSAL = "universal";
+
+        [FilePath(false, true, "Path to butler.exe")]
         public string pathToButlerExe = "";
         public string nameOfItchUser = "";
         public string nameOfItchGame = "";
         public bool useGeneratedBuildVersion = false;
+
+        [Header("Channel name")]
+        public string channelName = "$PLATFORM-$ARCHITECTURE";
 
         [Header("Disable to capture error output for debugging.")]
         public bool showUploadProgress = true;
@@ -44,13 +51,7 @@ namespace SuperUnityBuild.BuildActions
 
             switch (architecture.target)
             {
-#if UNITY_2017_3_OR_NEWER
                 case BuildTarget.StandaloneOSX:
-#else
-            case BuildTarget.StandaloneOSXIntel:
-            case BuildTarget.StandaloneOSXIntel64:
-            case BuildTarget.StandaloneOSXUniversal:
-#endif
 #if !UNITY_2019_2_OR_NEWER
                 case BuildTarget.StandaloneLinux:
                 case BuildTarget.StandaloneLinuxUniversal:
@@ -75,7 +76,7 @@ namespace SuperUnityBuild.BuildActions
             }
             else
             {
-                string itchChannel = GetChannelName(architecture.target);
+                string itchChannel = GetChannelName(channelName, architecture.target, releaseType);
                 if (string.IsNullOrEmpty(itchChannel))
                 {
                     UnityEngine.Debug.LogWarning("UploadItch: The current BuildTarget doesn't appear to be a standard Itch.IO build target.");
@@ -144,45 +145,60 @@ namespace SuperUnityBuild.BuildActions
             }
         }
 
-        private static string GetChannelName(BuildTarget target)
+        private static string GetChannelName(string channelNameFormat, BuildTarget target, BuildReleaseType buildReleaseType)
         {
+            string platform = string.Empty;
+            string architecture = string.Empty;
             switch (target)
             {
                 // Windows
                 case BuildTarget.StandaloneWindows:
-                    return WINDOWS + "-x86";
+                    platform = WINDOWS;
+                    architecture = ARCHITECTURE_X86;
+                    break;
                 case BuildTarget.StandaloneWindows64:
-                    return WINDOWS + "-x64";
+                    platform = WINDOWS;
+                    architecture = ARCHITECTURE_X64;
+                    break;
 
                 // Linux
 #if !UNITY_2019_2_OR_NEWER
                 case BuildTarget.StandaloneLinux:
-                    return LINUX + "-x86";
+                    platform = LINUX;
+                    architecture = ARCHITECTURE_X86;
+                    break;
                 case BuildTarget.StandaloneLinuxUniversal:
-                    return LINUX + "-universal";
+                    platform = LINUX;
+                    architecture = ARCHITECTURE_UNIVERSAL;
+                    break;
 #endif
                 case BuildTarget.StandaloneLinux64:
-                    return LINUX + "-x64";
+                    platform = LINUX;
+                    architecture = ARCHITECTURE_X64;
+                    break;
 
                 // OSX
-#if UNITY_2017_3_OR_NEWER
                 case BuildTarget.StandaloneOSX:
-                    return OSX;
-#else
-            case BuildTarget.StandaloneOSXIntel:
-                return OSX + "-intel";
-            case BuildTarget.StandaloneOSXIntel64:
-                return OSX + "-intel64";
-            case BuildTarget.StandaloneOSXUniversal:
-                return OSX + "-universal";
-#endif
+                    platform = OSX;
+                    architecture = ARCHITECTURE_UNIVERSAL;
+                    break;
+
                 // Android
                 case BuildTarget.Android:
-                    return ANDROID;
+                    platform = ANDROID;
+                    architecture = ARCHITECTURE_UNIVERSAL;
+                    break;
 
                 default:
                     return null;
             }
+
+            string channelName = channelNameFormat;
+            channelName = channelName.Replace("$PLATFORM", platform);
+            channelName = channelName.Replace("$ARCHITECTURE", architecture);
+            channelName = channelName.Replace("$RELEASE_TYPE", buildReleaseType.typeName);
+
+            return channelName;
         }
 
         #endregion
