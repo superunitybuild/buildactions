@@ -18,7 +18,7 @@ namespace SuperUnityBuild.BuildActions
         private const string ARCHITECTURE_X64 = "x64";
         private const string ARCHITECTURE_UNIVERSAL = "universal";
 
-        [FilePath(false, true, "Path to butler.exe")]
+        [BuildTool.FilePath(false, true, "Path to butler.exe")]
         public string pathToButlerExe = "";
         public string nameOfItchUser = "";
         public string nameOfItchGame = "";
