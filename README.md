@@ -1,10 +1,12 @@
-# SuperUnityBuild - BuildActions
+# SuperUnityBuild BuildActions
 
 [![openupm](https://img.shields.io/npm/v/com.github.superunitybuild.buildactions?label=openupm&registry_uri=https://package.openupm.com)][openupm-package]
 
 > BuildActions for use with the [SuperUnityBuild][buildtool] build automation tool.
 
 ![Logo](https://raw.githubusercontent.com/superunitybuild/buildtool/gh-pages/Cover.png)
+
+[Unity Forums Thread][unity-forums-thread] | [Documentation Wiki][wiki] | [OpenUPM package][openupm-package]
 
 BuildActions are one of the key components that make the [SuperUnityBuild][buildtool] build automation tool flexible and powerful. Each one extends the capabilities of SuperUnityBuild and can be easily setup and customized to suit your needs, and if there's some other specialized functionality that your project needs, you can simply write your own BuildActions and integrate them into the build process.
 
@@ -14,10 +16,11 @@ This repository is intended to serve as an ever expanding library of useful Buil
 
 ### Installation
 
-If you don't already have SuperUnityBuild, get it from its [GitHub repository][buildtool]. Then, do one of the following:
+BuildActions requires SuperUnityBuild to be [installed](https://github.com/superunitybuild/buildtool#installation) in your project.
 
--   [Download][download] this project and copy the folder for the tools you want into your project's Assets directory.
--   Make this repository a git submodule within your project's Assets directory.
+Official releases of BuildActions can be installed via [Unity Package Manager](https://docs.unity3d.com/Packages/com.unity.package-manager-ui@latest/index.html) from the [OpenUPM](https://openupm.com) package registry. See [https://openupm.com/packages/com.github.superunitybuild.buildactions/][openupm-package] for installation options.
+
+You can also [download the source zip][download] of this repository and extract its contents into your Unity project's `Packages` directory to install BuildActions as an embedded package.
 
 ### Setup
 
