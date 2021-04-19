@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+-   Removed pre-Unity 2018.1 code.
 -   Disable `XRSettings` build action when XR Plug-in Management package is installed.
 
 ## [1.0.0] - 2021-04-15

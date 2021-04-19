@@ -1,6 +1,6 @@
-﻿using System.IO;
+﻿using SuperUnityBuild.BuildTool;
+using System.IO;
 using System.Text;
-using SuperUnityBuild.BuildTool;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,11 +15,7 @@ namespace SuperUnityBuild.BuildActions
 
         public string innerBuildPath = Path.Combine("$PLATFORM", "$ARCHITECTURE");
 
-#if UNITY_5_3 || UNITY_5_4_OR_NEWER
         public BuildAssetBundleOptions options = BuildAssetBundleOptions.ChunkBasedCompression;
-#else
-    public BuildAssetBundleOptions options = BuildAssetBundleOptions.None;
-#endif
 
         #endregion
 
@@ -56,11 +52,7 @@ namespace SuperUnityBuild.BuildActions
         {
             EditorGUILayout.PropertyField(obj.FindProperty("baseBuildPath"));
             EditorGUILayout.PropertyField(obj.FindProperty("innerBuildPath"));
-#if UNITY_2017_3_OR_NEWER
             options = (BuildAssetBundleOptions)EditorGUILayout.EnumFlagsField("Options", options);
-#else
-        options = (BuildAssetBundleOptions)((int)(BuildAssetBundleOptions)EditorGUILayout.EnumMaskField("Options", (BuildAssetBundleOptions)((int)(options) << 1)) >> 1);
-#endif
 
             if (GUILayout.Button("Run Now", GUILayout.ExpandWidth(true)))
             {
