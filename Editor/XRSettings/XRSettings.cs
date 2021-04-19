@@ -2,7 +2,7 @@
 #define SUPPORTS_OCULUS_V2_SIGNING
 #endif
 
-#if !UNITY_2020_2_OR_NEWER
+#if !UNITY_2020_2_OR_NEWER && !UNITY_XR_MANAGEMENT
 using System;
 using System.Collections.Generic;
 using SuperUnityBuild.BuildTool;
