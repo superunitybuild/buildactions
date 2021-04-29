@@ -1,11 +1,11 @@
 {
   "name": "com.github.superunitybuild.buildactions",
   "displayName": "SuperUnityBuild BuildActions",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "unity": "2018.1",
   "description": "BuildActions are one of the key components that make the SuperUnityBuild build automation tool flexible and powerful. Each one extends the capabilities of SuperUnityBuild and can be easily setup and customized to suit your needs",
   "type": "library",
   "dependencies": {
-    "com.github.superunitybuild.buildtool": "1.0.0"
+    "com.github.superunitybuild.buildtool": "1.1.0"
   }
 }
