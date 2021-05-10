@@ -23,7 +23,7 @@ namespace SuperUnityBuild.BuildActions
         {
             StringBuilder sb = new StringBuilder(prototype);
 
-            sb.Replace("$VERSION", BuildProject.SanitizeFolderName(BuildSettings.productParameters.lastGeneratedVersion));
+            sb.Replace("$VERSION", BuildProject.SanitizeFolderName(BuildSettings.productParameters.buildVersion));
             sb.Replace("$BUILD", BuildSettings.productParameters.buildCounter.ToString());
 
             return sb.ToString();

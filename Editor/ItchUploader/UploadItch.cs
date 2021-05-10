@@ -65,7 +65,7 @@ namespace SuperUnityBuild.BuildActions
             if (useGeneratedBuildVersion)
             {
                 // Append generated versions string.
-                scriptArguments.Append(string.Format("--userversion \"{0}\" ", BuildSettings.productParameters.lastGeneratedVersion));
+                scriptArguments.Append(string.Format("--userversion \"{0}\" ", BuildSettings.productParameters.buildVersion));
             }
 
             scriptArguments.Append("\"" + buildPath + "\"" + " " + nameOfItchUser + "/" + nameOfItchGame + ":");
