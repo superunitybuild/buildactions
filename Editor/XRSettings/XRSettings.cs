@@ -1,11 +1,11 @@
 #if !UNITY_2020_2_OR_NEWER && !UNITY_XR_MANAGEMENT
-#if UNITY_2018_4 || UNITY_2019_2_OR_NEWER
+#if UNITY_2019_2_OR_NEWER
 #define SUPPORTS_OCULUS_V2_SIGNING
 #endif
 
+using SuperUnityBuild.BuildTool;
 using System;
 using System.Collections.Generic;
-using SuperUnityBuild.BuildTool;
 using UnityEditor;
 using UnityEngine;
 
