@@ -1,11 +1,11 @@
-﻿using System.Diagnostics;
+﻿using SuperUnityBuild.BuildTool;
+using System.Diagnostics;
 using System.IO;
-using SuperUnityBuild.BuildTool;
 using UnityEditor;
 
 namespace SuperUnityBuild.BuildActions
 {
-    public class ScriptRunner : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction
+    public class ScriptRunner : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction, IPreBuildPerPlatformActionCanConfigureEditor
     {
         [BuildTool.FilePath(false, true, "Select program/script to run.")]
         public string scriptPath = "";

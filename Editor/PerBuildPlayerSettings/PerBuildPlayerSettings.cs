@@ -1,14 +1,14 @@
+using SuperUnityBuild.BuildTool;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SuperUnityBuild.BuildTool;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace SuperUnityBuild.BuildActions
 {
-    public class PerBuildPlayerSettings : BuildAction, IPreBuildPerPlatformAction, IPostBuildPerPlatformAction
+    public class PerBuildPlayerSettings : BuildAction, IPreBuildPerPlatformAction, IPostBuildPerPlatformAction, IPreBuildPerPlatformActionCanConfigureEditor
     {
         [Header("Other Settings")]
         [Tooltip("Preloaded assets to set for this build")] public List<Object> PreloadedAssets = new List<Object>();

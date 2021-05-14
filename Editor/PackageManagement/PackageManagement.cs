@@ -1,13 +1,13 @@
+using SuperUnityBuild.BuildTool;
 using System;
 using System.Collections.Generic;
-using SuperUnityBuild.BuildTool;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 namespace SuperUnityBuild.BuildActions
 {
-    public class PackageManagement : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction
+    public class PackageManagement : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction, IPreBuildPerPlatformActionCanConfigureEditor
     {
         [Header("Package Settings")]
         [Tooltip("List of package IDs to add")] public List<string> PackagesToAdd = new List<string>();

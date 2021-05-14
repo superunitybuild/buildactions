@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SuperUnityBuild.BuildActions
 {
-    public class OverrideDefines : BuildAction, IPreBuildPerPlatformAction
+    public class OverrideDefines : BuildAction, IPreBuildPerPlatformAction, IPreBuildPerPlatformActionCanConfigureEditor
     {
         public string removeDefines;
         public string addDefines;

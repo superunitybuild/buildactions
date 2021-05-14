@@ -7,7 +7,7 @@ namespace SuperUnityBuild.BuildActions
 {
     using Operation = FileUtility.Operation;
 
-    public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction
+    public class FolderOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction, IPreBuildPerPlatformActionCanConfigureEditor
     {
         [BuildTool.FilePath(true)]
         public string inputPath;

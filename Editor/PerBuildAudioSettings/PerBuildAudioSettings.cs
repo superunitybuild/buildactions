@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SuperUnityBuild.BuildActions
 {
-    public class PerBuildAudioSettings : BuildAction, IPreBuildPerPlatformAction, IPostBuildPerPlatformAction
+    public class PerBuildAudioSettings : BuildAction, IPreBuildPerPlatformAction, IPostBuildPerPlatformAction, IPreBuildPerPlatformActionCanConfigureEditor
     {
         [Tooltip("Spatializer plugin to use for this build")] public string SpatializerPlugin = "";
 

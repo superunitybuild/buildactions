@@ -9,7 +9,7 @@ using UnityEngine.XR.Management;
 
 namespace SuperUnityBuild.BuildActions
 {
-    public class XRPluginManagement : BuildAction, IPreBuildPerPlatformAction, IPostBuildPerPlatformAction
+    public class XRPluginManagement : BuildAction, IPreBuildPerPlatformAction, IPostBuildPerPlatformAction, IPreBuildPerPlatformActionCanConfigureEditor
     {
         [Header("XR Settings")]
         [Tooltip("XR plugin loaders to use for this build")] public List<XRLoader> XRPlugins = new List<XRLoader>();

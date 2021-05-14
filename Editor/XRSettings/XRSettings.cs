@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SuperUnityBuild.BuildActions
 {
-    public class XRSettings : BuildAction, IPreBuildPerPlatformAction, IPostBuildPerPlatformAction
+    public class XRSettings : BuildAction, IPreBuildPerPlatformAction, IPostBuildPerPlatformAction, IPreBuildPerPlatformActionCanConfigureEditor
     {
         public enum SDK
         {
