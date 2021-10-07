@@ -23,6 +23,7 @@ namespace SuperUnityBuild.BuildActions
         {
             spatializerPluginNames = AudioSettings.GetSpatializerPluginNames();
             spatializerPluginNames = spatializerPluginNames.Prepend("None").ToArray();
+            index = Math.Max(Array.IndexOf(spatializerPluginNames, SpatializerPlugin), 0);
         }
 
         protected override void DrawProperty(SerializedProperty prop)
