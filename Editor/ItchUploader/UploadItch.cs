@@ -13,6 +13,7 @@ namespace SuperUnityBuild.BuildActions
         private const string OSX = "mac";
         private const string LINUX = "linux";
         private const string ANDROID = "android";
+        private const string WEBGL = "webgl";
 
         private const string ARCHITECTURE_X86 = "x86";
         private const string ARCHITECTURE_X64 = "x64";
@@ -187,6 +188,11 @@ namespace SuperUnityBuild.BuildActions
                 case BuildTarget.Android:
                     platform = ANDROID;
                     architecture = ARCHITECTURE_UNIVERSAL;
+                    break;
+
+                // WebGL
+                case BuildTarget.WebGL:
+                    platform = WEBGL;
                     break;
 
                 default:
