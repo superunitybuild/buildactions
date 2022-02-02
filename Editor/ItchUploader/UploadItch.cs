@@ -14,6 +14,7 @@ namespace SuperUnityBuild.BuildActions
         private const string LINUX = "linux";
         private const string ANDROID = "android";
         private const string WEBGL = "webgl";
+        private const string UWP = "uwp";
 
         private const string ARCHITECTURE_X86 = "x86";
         private const string ARCHITECTURE_X64 = "x64";
@@ -71,20 +72,10 @@ namespace SuperUnityBuild.BuildActions
 
             scriptArguments.Append("\"" + buildPath + "\"" + " " + nameOfItchUser + "/" + nameOfItchGame + ":");
 
-            if (!string.IsNullOrEmpty(itchChannelOverride))
-            {
-                scriptArguments.Append(itchChannelOverride);
-            }
-            else
-            {
-                string itchChannel = GetChannelName(channelName, architecture.target, releaseType);
-                if (string.IsNullOrEmpty(itchChannel))
-                {
-                    UnityEngine.Debug.LogWarning("UploadItch: The current BuildTarget doesn't appear to be a standard Itch.IO build target.");
-                }
-
-                scriptArguments.Append(itchChannel);
-            }
+            scriptArguments.Append(!string.IsNullOrEmpty(itchChannelOverride) ?
+                itchChannelOverride :
+                GetChannelName(channelName, architecture.target, releaseType)
+            );
 
             // UnityEngine.Debug.Log("Would have run itch uploader with following command line: \"" + pathToButlerExe + " " + scriptArguments + "\"");
             RunScript(pathToButlerExe, scriptArguments.ToString());
@@ -150,6 +141,7 @@ namespace SuperUnityBuild.BuildActions
         {
             string platform = string.Empty;
             string architecture = string.Empty;
+
             switch (target)
             {
                 // Windows
@@ -195,16 +187,24 @@ namespace SuperUnityBuild.BuildActions
                     platform = WEBGL;
                     break;
 
+                // UWP
+                case BuildTarget.WSAPlayer:
+                    platform = UWP;
+                    architecture = EditorUserBuildSettings.wsaArchitecture;
+                    break;
+
+                // Other
                 default:
-                    return null;
+                    UnityEngine.Debug.LogWarning("UploadItch: The current BuildTarget doesn't appear to be a standard Itch.IO build target.");
+                    platform = target.ToString().ToLower();
+                    break;
             }
 
-            string channelName = channelNameFormat;
-            channelName = channelName.Replace("$PLATFORM", platform);
-            channelName = channelName.Replace("$ARCHITECTURE", architecture);
-            channelName = channelName.Replace("$RELEASE_TYPE", buildReleaseType.typeName);
-
-            return channelName;
+            return channelNameFormat
+                .Replace("$PLATFORM", platform)
+                .Replace("$ARCHITECTURE", architecture)
+                .Replace("$RELEASE_TYPE", buildReleaseType.typeName)
+                .Trim('-');
         }
 
         #endregion

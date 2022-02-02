@@ -5,13 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<!-- ## [Unreleased] -->
+## [Unreleased]
+
+### Added
+
+-   Added support for WebGL and UWP platforms to `ItchUploader` action.
+
+### Fixed
+
+-   Fixed `ItchUploader` action generating invalid butler command for unknown build platforms.
 
 ## [2.1.1] - 2021-10-07
 
-### Changed
+### Fixed
 
--   Fixed incorrect selection in audio spatializer dropdown on startup in `PerBuildAudioSettings` action
+-   Fixed incorrect selection in audio spatializer dropdown on startup in `PerBuildAudioSettings` action.
 
 ## [2.1.0] - 2021-08-24
 
