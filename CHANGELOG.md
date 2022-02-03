@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+<!-- ## [Unreleased] -->
+
+## [2.2.0] - 2022-02-03
 
 ### Added
 
@@ -77,7 +79,8 @@ This release includes all [previous commits][1.0.0] to the project, plus:
 
 -   `OverrideDefines` action no longer ignore pre build defines. [PR #17](https://github.com/superunitybuild/buildactions/pull/17)
 
-[unreleased]: https://github.com/superunitybuild/buildactions/compare/v2.1.1...HEAD
+[unreleased]: https://github.com/superunitybuild/buildactions/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/superunitybuild/buildactions/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/superunitybuild/buildactions/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/superunitybuild/buildactions/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/superunitybuild/buildactions/compare/v1.3.0...v2.0.0
