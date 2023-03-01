@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
-using Ionic.Zip;
+﻿using Ionic.Zip;
 using SuperUnityBuild.BuildTool;
+using System;
+using System.IO;
 using UnityEngine;
 
 namespace SuperUnityBuild.BuildActions
@@ -53,6 +53,7 @@ namespace SuperUnityBuild.BuildActions
                 using (ZipFile zip = new ZipFile(outputPath))
                 {
                     zip.ParallelDeflateThreshold = -1; // Parallel deflate is bugged in DotNetZip, so we need to disable it.
+                    zip.UseZip64WhenSaving = Zip64Option.AsNecessary;
                     zip.AddDirectory(inputPath);
                     zip.Save();
                 }
