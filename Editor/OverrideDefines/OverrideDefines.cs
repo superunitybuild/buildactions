@@ -12,16 +12,16 @@ namespace SuperUnityBuild.BuildActions
         public string removeDefines;
         public string addDefines;
 
-        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
+        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
             string preBuildDefines = PlayerSettings.GetScriptingDefineSymbolsForGroup(platform.targetGroup);
-            string defaultDefines = BuildProject.GenerateDefaultDefines(releaseType, platform, architecture, distribution);
+            string defaultDefines = BuildProject.GenerateDefaultDefines(releaseType, platform, architecture, scriptingBackend, distribution);
 
             StringBuilder mergedDefines = new StringBuilder(BuildProject.MergeDefines(preBuildDefines, defaultDefines));
 
             if (!string.IsNullOrEmpty(removeDefines))
             {
-                string resolvedRemove = BuildProject.ResolvePath(removeDefines, releaseType, platform, architecture, distribution, buildTime);
+                string resolvedRemove = BuildProject.ResolvePath(removeDefines, releaseType, platform, architecture, scriptingBackend, distribution, buildTime);
                 string[] splitRemove = resolvedRemove.Split(';');
 
                 for (int i = 0; i < splitRemove.Length; i++)
@@ -33,7 +33,7 @@ namespace SuperUnityBuild.BuildActions
 
             if (!string.IsNullOrEmpty(addDefines))
             {
-                string resolvedAdd = BuildProject.ResolvePath(addDefines, releaseType, platform, architecture, distribution, buildTime);
+                string resolvedAdd = BuildProject.ResolvePath(addDefines, releaseType, platform, architecture, scriptingBackend, distribution, buildTime);
 
                 if (mergedDefines.Length > 0)
                     mergedDefines.Append(";");

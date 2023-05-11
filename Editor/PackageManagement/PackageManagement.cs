@@ -13,7 +13,7 @@ namespace SuperUnityBuild.BuildActions
         [Tooltip("List of package IDs to add")] public List<string> PackagesToAdd = new List<string>();
         [Tooltip("List of package IDs to remove")] public List<string> PackagesToRemove = new List<string>();
 
-        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
+        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
 
             PackagesToRemove.ForEach(id => HandleRequest(Client.Remove(id), id));

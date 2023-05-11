@@ -10,7 +10,7 @@ namespace SuperUnityBuild.BuildActions
     {
         [Tooltip("Spatializer plugin to use for this build")] public string SpatializerPlugin = "";
 
-        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
+        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
             // Set spatializer plugin
             AudioSettings.SetSpatializerPluginName(SpatializerPlugin);

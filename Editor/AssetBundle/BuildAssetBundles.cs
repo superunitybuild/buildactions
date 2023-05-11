@@ -25,6 +25,7 @@ namespace SuperUnityBuild.BuildActions
             BuildReleaseType releaseType,
             BuildPlatform platform,
             BuildArchitecture architecture,
+            BuildScriptingBackend scriptingBackend,
             BuildDistribution distribution,
             System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
@@ -39,12 +40,13 @@ namespace SuperUnityBuild.BuildActions
             {
                 BuildReleaseType releaseType;
                 BuildPlatform platform;
-                BuildArchitecture arch;
-                BuildDistribution dist;
+                BuildArchitecture architecture;
+                BuildDistribution distribution;
+                BuildScriptingBackend scriptingBackend;
                 string configKey = buildConfigs[i];
 
-                BuildSettings.projectConfigurations.ParseKeychain(configKey, out releaseType, out platform, out arch, out dist);
-                Build(platform, arch);
+                BuildSettings.projectConfigurations.ParseKeychain(configKey, out releaseType, out platform, out architecture, out scriptingBackend, out distribution);
+                Build(platform, architecture);
             }
         }
 
@@ -55,9 +57,7 @@ namespace SuperUnityBuild.BuildActions
             options = (BuildAssetBundleOptions)EditorGUILayout.EnumFlagsField("Options", options);
 
             if (GUILayout.Button("Run Now", GUILayout.ExpandWidth(true)))
-            {
                 BuildAll();
-            }
         }
 
         #endregion

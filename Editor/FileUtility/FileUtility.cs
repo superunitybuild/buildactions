@@ -29,13 +29,13 @@ namespace SuperUnityBuild.BuildActions
             return sb.ToString();
         }
 
-        public static string ResolvePerBuildPath(string prototype, BuildReleaseType releaseType, BuildPlatform buildPlatform, BuildArchitecture arch, BuildDistribution dist, DateTime buildTime, string buildPath)
+        public static string ResolvePerBuildPath(string prototype, BuildReleaseType releaseType, BuildPlatform buildPlatform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, string buildPath)
         {
             return BuildProject.ResolvePath(
                 prototype
                     .Replace("$BUILDPATH", buildPath)
                     .Replace("$BASEPATH", BuildSettings.basicSettings.baseBuildFolder),
-                releaseType, buildPlatform, arch, dist, buildTime);
+                releaseType, buildPlatform, architecture, scriptingBackend, distribution, buildTime);
         }
     }
 }

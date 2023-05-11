@@ -14,7 +14,7 @@ namespace SuperUnityBuild.BuildActions
         [Tooltip("Preloaded assets to set for this build")] public List<Object> PreloadedAssets = new List<Object>();
         [Tooltip("Whether or not to preserve existing preloaded assets")] public bool PreservePreloadedAssets = true;
 
-        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
+        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
             // Set preloaded assets
             Object[] preloadedAssets = PlayerSettings.GetPreloadedAssets();
