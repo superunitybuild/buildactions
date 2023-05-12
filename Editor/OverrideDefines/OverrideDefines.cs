@@ -1,9 +1,7 @@
 ﻿using SuperUnityBuild.BuildTool;
-using System.Collections;
-using System.IO;
+using System;
 using System.Text;
 using UnityEditor;
-using UnityEngine;
 
 namespace SuperUnityBuild.BuildActions
 {
@@ -12,7 +10,7 @@ namespace SuperUnityBuild.BuildActions
         public string removeDefines;
         public string addDefines;
 
-        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, System.DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
+        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
             string preBuildDefines = PlayerSettings.GetScriptingDefineSymbolsForGroup(platform.targetGroup);
             string defaultDefines = BuildProject.GenerateDefaultDefines(releaseType, platform, architecture, scriptingBackend, distribution);

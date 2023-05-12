@@ -12,7 +12,7 @@ namespace SuperUnityBuild.BuildActions
         public string outputPath = "$BUILDPATH";
         public string outputFileName = "$PRODUCT_NAME-$RELEASE_TYPE-$YEAR_$MONTH_$DAY.zip";
 
-        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, System.DateTime buildTime, ref UnityEditor.BuildOptions options, string configKey, string buildPath)
+        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref UnityEditor.BuildOptions options, string configKey, string buildPath)
         {
             string resolvedOutputPath = Path.Combine(outputPath.Replace("$BUILDPATH", buildPath), outputFileName);
             resolvedOutputPath = BuildProject.ResolvePath(resolvedOutputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime);
