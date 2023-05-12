@@ -2,7 +2,7 @@
   "name": "com.github.superunitybuild.buildactions",
   "displayName": "SuperUnityBuild BuildActions",
   "version": "2.2.0",
-  "unity": "2019.1",
+  "unity": "2020.3",
   "description": "BuildActions are one of the key components that make the SuperUnityBuild build automation tool flexible and powerful. Each one extends the capabilities of SuperUnityBuild and can be easily setup and customized to suit your needs",
   "changelogUrl": "CHANGELOG.md",
   "documentationUrl": "https://github.com/superunitybuild/buildtool/wiki",

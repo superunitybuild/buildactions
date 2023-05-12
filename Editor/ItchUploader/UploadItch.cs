@@ -1,4 +1,5 @@
 ﻿using SuperUnityBuild.BuildTool;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -54,10 +55,6 @@ namespace SuperUnityBuild.BuildActions
             switch (architecture.target)
             {
                 case BuildTarget.StandaloneOSX:
-#if !UNITY_2019_2_OR_NEWER
-                case BuildTarget.StandaloneLinux:
-                case BuildTarget.StandaloneLinuxUniversal:
-#endif
                 case BuildTarget.StandaloneLinux64:
                     // Fix exe permissions for Linux/OSX.
                     scriptArguments.Append("--fix-permissions ");
@@ -155,16 +152,6 @@ namespace SuperUnityBuild.BuildActions
                     break;
 
                 // Linux
-#if !UNITY_2019_2_OR_NEWER
-                case BuildTarget.StandaloneLinux:
-                    platform = LINUX;
-                    architecture = ARCHITECTURE_X86;
-                    break;
-                case BuildTarget.StandaloneLinuxUniversal:
-                    platform = LINUX;
-                    architecture = ARCHITECTURE_UNIVERSAL;
-                    break;
-#endif
                 case BuildTarget.StandaloneLinux64:
                     platform = LINUX;
                     architecture = ARCHITECTURE_X64;

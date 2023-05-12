@@ -36,7 +36,6 @@ Refer to the [SuperUnityBuild wiki][wiki] for basic information on how to setup,
 -   [**Override Defines**][overridedefines] - Add/remove script defines.
 -   [**Package Management**][packagemanagement] - Enable per-build Unity Package Manager settings.
 -   [**Per-Build Player Settings**][perbuildplayersettings] - Enable per-build Player settings.
--   [**XR Settings**][xrsettings] - Enable per-build legacy Unity XR settings.
 -   [**XR Plug-in Management**][xrpluginmanagement] - Enable per-build [Unity XR Plug-in Management](https://docs.unity3d.com/Packages/com.unity.xr.management@latest) settings.
 
 ## Contributing
@@ -80,4 +79,3 @@ Zip File Utility includes a pre-compiled DotNetZip library which is licensed und
 [packagemanagement]: https://github.com/superunitybuild/buildactions/tree/master/Editor/PackageManagement
 [perbuildplayersettings]: https://github.com/superunitybuild/buildactions/tree/master/Editor/PerBuildPlayerSettings
 [xrpluginmanagement]: https://github.com/superunitybuild/buildactions/tree/master/Editor/XRPluginManagement
-[xrsettings]: https://github.com/superunitybuild/buildactions/tree/master/Editor/XRSettings
