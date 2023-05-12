@@ -4,8 +4,14 @@
   "version": "2.2.0",
   "unity": "2019.1",
   "description": "BuildActions are one of the key components that make the SuperUnityBuild build automation tool flexible and powerful. Each one extends the capabilities of SuperUnityBuild and can be easily setup and customized to suit your needs",
-  "type": "library",
+  "changelogUrl": "CHANGELOG.md",
+  "documentationUrl": "https://github.com/superunitybuild/buildtool/wiki",
+  "licenseUrl": "LICENSE.md",
   "dependencies": {
     "com.github.superunitybuild.buildtool": "2.1.0"
+  },
+  "author": {
+    "name": "SuperUnityBuild",
+    "url": "https://github.com/superunitybuild"
   }
 }
