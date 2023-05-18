@@ -20,20 +20,7 @@ namespace SuperUnityBuild.BuildActions
             string resolvedInputPath = FileUtility.ResolvePath(inputPath);
             string resolvedOutputPath = FileUtility.ResolvePath(outputPath);
 
-            switch (operation)
-            {
-                case Operation.Copy:
-                    Copy(resolvedInputPath, resolvedOutputPath);
-                    break;
-                case Operation.Move:
-                    Move(resolvedInputPath, resolvedOutputPath);
-                    break;
-                case Operation.Delete:
-                    Delete(resolvedInputPath);
-                    break;
-            }
-
-            AssetDatabase.Refresh();
+            PerformOperation(resolvedInputPath, resolvedOutputPath);
         }
 
         public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
@@ -41,20 +28,7 @@ namespace SuperUnityBuild.BuildActions
             string resolvedInputPath = FileUtility.ResolvePerBuildPath(inputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
             string resolvedOutputPath = FileUtility.ResolvePerBuildPath(outputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
 
-            switch (operation)
-            {
-                case Operation.Copy:
-                    Copy(resolvedInputPath, resolvedOutputPath);
-                    break;
-                case Operation.Move:
-                    Move(resolvedInputPath, resolvedOutputPath);
-                    break;
-                case Operation.Delete:
-                    Delete(resolvedInputPath);
-                    break;
-            }
-
-            AssetDatabase.Refresh();
+            PerformOperation(resolvedInputPath, resolvedOutputPath);
         }
 
         protected override void DrawProperties(SerializedObject obj)
@@ -66,83 +40,62 @@ namespace SuperUnityBuild.BuildActions
                 EditorGUILayout.PropertyField(obj.FindProperty("outputPath"));
         }
 
-        private void Move(string inputPath, string outputPath, bool overwrite = true)
+        private void PerformOperation(string inputPath, string outputPath)
         {
-            bool success = true;
-            string errorString = "";
-
-            if (!Directory.Exists(inputPath))
+            switch (operation)
             {
-                // Error. Input does not exist.
-                success = false;
-                errorString = $"Input \"{inputPath}\" does not exist.";
+                case Operation.Copy:
+                    Copy(inputPath, outputPath);
+                    break;
+                case Operation.Move:
+                    Move(inputPath, outputPath);
+                    break;
+                case Operation.Delete:
+                    Delete(inputPath);
+                    break;
             }
 
-            // Make sure that all parent directories in path are already created.
-            string parentPath = Path.GetDirectoryName(outputPath);
-            if (!Directory.Exists(parentPath))
-            {
-                Directory.CreateDirectory(parentPath);
-            }
-
-            if (overwrite && Directory.Exists(outputPath))
-            {
-                // Delete previous output.
-                success = FileUtil.DeleteFileOrDirectory(outputPath);
-
-                if (!success)
-                    errorString = $"Could not overwrite existing folder \"{outputPath}\".";
-            }
-
-            FileUtil.MoveFileOrDirectory(inputPath, outputPath);
-
-            if (!success && !string.IsNullOrEmpty(errorString))
-            {
-                BuildNotificationList.instance.AddNotification(new BuildNotification(
-                    BuildNotification.Category.Error,
-                    "Folder Move Failed.", errorString,
-                    true, null));
-            }
+            AssetDatabase.Refresh();
         }
 
         private void Copy(string inputPath, string outputPath, bool overwrite = true)
         {
+            CopyOrMove(true, inputPath, outputPath, overwrite);
+        }
+
+        private void Move(string inputPath, string outputPath, bool overwrite = true)
+        {
+            CopyOrMove(false, inputPath, outputPath, overwrite);
+        }
+
+        private void CopyOrMove(bool isCopy, string inputPath, string outputPath, bool overwrite = true)
+        {
+            Action<string, string> fileOperation = FileUtility.GetCopyOrMoveAction(isCopy);
+
             bool success = true;
             string errorString = "";
 
-            if (!Directory.Exists(inputPath))
-            {
-                // Error. Input does not exist.
-                success = false;
-                errorString = $"Input \"{inputPath}\" does not exist.";
-            }
-
-            // Make sure that all parent directories in path are already created.
-            string parentPath = Path.GetDirectoryName(outputPath);
-            if (!Directory.Exists(parentPath))
-            {
-                Directory.CreateDirectory(parentPath);
-            }
-
-            if (success && overwrite && Directory.Exists(outputPath))
-            {
-                // Delete previous output.
-                success = FileUtil.DeleteFileOrDirectory(outputPath);
-
-                if (!success)
-                    errorString = $"Could not overwrite existing folder \"{outputPath}\".";
-            }
+            success = ValidatePath(inputPath, FileUtility.PathType.Input, true, out errorString);
 
             if (success)
-                FileUtil.CopyFileOrDirectory(inputPath, outputPath);
+                success = ValidatePath(outputPath, FileUtility.PathType.Output, false, out errorString);
 
-            if (!success && !string.IsNullOrEmpty(errorString))
+            if (success)
             {
-                BuildNotificationList.instance.AddNotification(new BuildNotification(
-                    BuildNotification.Category.Error,
-                    "Folder Copy Failed.", errorString,
-                    true, null));
+                // Make sure that all parent directories in path are already created.
+                string parentPath = Path.GetDirectoryName(outputPath);
+
+                if (!Directory.Exists(parentPath))
+                    Directory.CreateDirectory(parentPath);
+
+                if (overwrite && Directory.Exists(outputPath))
+                    success = FileUtility.Delete(outputPath, $"Could not overwrite existing folder \"{outputPath}\".", out errorString);
+
+                if (success)
+                    fileOperation(inputPath, outputPath);
             }
+
+            FileUtility.OperationComplete(success, $"Folder {(isCopy ? "Copy" : "Move")} Failed.", errorString);
         }
 
         private void Delete(string inputPath)
@@ -150,27 +103,17 @@ namespace SuperUnityBuild.BuildActions
             bool success = true;
             string errorString = "";
 
-            if (Directory.Exists(inputPath))
-            {
-                success = FileUtil.DeleteFileOrDirectory(inputPath);
+            success = ValidatePath(inputPath, FileUtility.PathType.Input, true, out errorString);
 
-                if (!success)
-                    errorString = $"Could not delete folder \"{inputPath}\".";
-            }
-            else
-            {
-                // Error. Path does not exist.
-                success = false;
-                errorString = $"Input \"{inputPath}\" does not exist.";
-            }
+            if (success)
+                success = FileUtility.Delete(inputPath, $"Could not delete folder \"{inputPath}\".", out errorString);
 
-            if (!success && !string.IsNullOrEmpty(errorString))
-            {
-                BuildNotificationList.instance.AddNotification(new BuildNotification(
-                    BuildNotification.Category.Error,
-                    "Folder Delete Failed.", errorString,
-                    true, null));
-            }
+            FileUtility.OperationComplete(success, "Folder Delete Failed.", errorString);
+        }
+
+        private bool ValidatePath(string path, FileUtility.PathType pathType, bool checkForExistence, out string errorString)
+        {
+            return FileUtility.ValidatePath(path, pathType, checkForExistence, false, out errorString);
         }
     }
 }

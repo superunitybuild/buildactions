@@ -21,20 +21,7 @@ namespace SuperUnityBuild.BuildActions
             string resolvedInputPath = FileUtility.ResolvePath(inputPath);
             string resolvedOutputPath = FileUtility.ResolvePath(outputPath);
 
-            switch (operation)
-            {
-                case Operation.Copy:
-                    Copy(resolvedInputPath, resolvedOutputPath);
-                    break;
-                case Operation.Move:
-                    Move(resolvedInputPath, resolvedOutputPath);
-                    break;
-                case Operation.Delete:
-                    Delete(resolvedInputPath);
-                    break;
-            }
-
-            AssetDatabase.Refresh();
+            PerformOperation(resolvedInputPath, resolvedOutputPath);
         }
 
         public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
@@ -42,20 +29,7 @@ namespace SuperUnityBuild.BuildActions
             string resolvedInputPath = FileUtility.ResolvePerBuildPath(inputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
             string resolvedOutputPath = FileUtility.ResolvePerBuildPath(outputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
 
-            switch (operation)
-            {
-                case Operation.Copy:
-                    Copy(resolvedInputPath, resolvedOutputPath);
-                    break;
-                case Operation.Move:
-                    Move(resolvedInputPath, resolvedOutputPath);
-                    break;
-                case Operation.Delete:
-                    Delete(resolvedInputPath);
-                    break;
-            }
-
-            AssetDatabase.Refresh();
+            PerformOperation(resolvedInputPath, resolvedOutputPath);
         }
 
         protected override void DrawProperties(SerializedObject obj)
@@ -73,126 +47,79 @@ namespace SuperUnityBuild.BuildActions
                 EditorGUILayout.PropertyField(obj.FindProperty("outputPath"));
         }
 
-        private void Move(string inputPath, string outputPath, bool overwrite = true)
+        private void PerformOperation(string inputPath, string outputPath)
         {
-            bool success = true;
-            string errorString = "";
-            bool containsWildcard = FileUtility.ContainsWildcard(inputPath);
-
-            if (!containsWildcard && !File.Exists(inputPath))
+            switch (operation)
             {
-                // Error. Input does not exist.
-                success = false;
-                errorString = $"Input \"{inputPath}\" does not exist.";
+                case Operation.Copy:
+                    Copy(inputPath, outputPath);
+                    break;
+                case Operation.Move:
+                    Move(inputPath, outputPath);
+                    break;
+                case Operation.Delete:
+                    Delete(inputPath);
+                    break;
             }
 
-            if (success && !containsWildcard && overwrite && File.Exists(outputPath))
-            {
-                // Delete previous output.
-                success = FileUtil.DeleteFileOrDirectory(outputPath);
-
-                if (!success)
-                    errorString = $"Could not overwrite existing file \"{outputPath}\".";
-            }
-
-            if (success && containsWildcard)
-            {
-                string inputDirectory = Path.GetDirectoryName(inputPath);
-                string outputDirectory = Path.GetDirectoryName(outputPath);
-
-                SearchOption option = recursiveSearch ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-                string[] fileList = Directory.GetFiles(inputDirectory, Path.GetFileName(inputPath), option);
-
-                for (int i = 0; i < fileList.Length; i++)
-                {
-                    if (!success)
-                        break;
-
-                    string fileName = Path.GetFileName(fileList[i]);
-                    string outputFile = Path.Combine(outputDirectory, fileName);
-
-                    if (File.Exists(outputFile))
-                        success = FileUtil.DeleteFileOrDirectory(outputFile);
-
-                    if (!success)
-                        errorString = $"Could not overwrite existing file \"{outputPath}\".";
-
-                    FileUtil.MoveFileOrDirectory(fileList[i], outputFile);
-                }
-            }
-            else if (success)
-            {
-                FileUtil.MoveFileOrDirectory(inputPath, outputPath);
-            }
-
-            if (!success && !string.IsNullOrEmpty(errorString))
-            {
-                BuildNotificationList.instance.AddNotification(new BuildNotification(
-                    BuildNotification.Category.Error,
-                    "File Move Failed.", errorString,
-                    true, null));
-            }
+            AssetDatabase.Refresh();
         }
 
         private void Copy(string inputPath, string outputPath, bool overwrite = true)
         {
+            CopyOrMove(true, inputPath, outputPath, overwrite);
+        }
+
+        private void Move(string inputPath, string outputPath, bool overwrite = true)
+        {
+            CopyOrMove(false, inputPath, outputPath, overwrite);
+        }
+
+        private void CopyOrMove(bool isCopy, string inputPath, string outputPath, bool overwrite = true)
+        {
+            Action<string, string> fileOperation = FileUtility.GetCopyOrMoveAction(isCopy);
+
             bool success = true;
             string errorString = "";
             bool containsWildcard = FileUtility.ContainsWildcard(inputPath);
 
-            if (!containsWildcard && !File.Exists(inputPath))
+            success = ValidatePath(inputPath, FileUtility.PathType.Input, !containsWildcard, out errorString);
+
+            if (success)
+                success = ValidatePath(outputPath, FileUtility.PathType.Output, false, out errorString);
+
+            if (success)
             {
-                // Error. Input does not exist.
-                success = false;
-                errorString = $"Input \"{inputPath}\" does not exist.";
-            }
-
-            if (success && !containsWildcard && overwrite && File.Exists(outputPath))
-            {
-                // Delete previous output.
-                success = FileUtil.DeleteFileOrDirectory(outputPath);
-
-                if (!success)
-                    errorString = $"Could not overwrite existing file \"{outputPath}\".";
-            }
-
-            if (success && containsWildcard)
-            {
-                string inputDirectory = Path.GetDirectoryName(inputPath);
-                string outputDirectory = Path.GetDirectoryName(outputPath);
-
-                SearchOption option = recursiveSearch ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-                string[] fileList = Directory.GetFiles(inputDirectory, Path.GetFileName(inputPath), option);
-
-                for (int i = 0; i < fileList.Length; i++)
+                if (containsWildcard)
                 {
-                    if (!success)
-                        break;
+                    string outputDirectory = Path.GetDirectoryName(outputPath);
 
-                    string fileName = Path.GetFileName(fileList[i]);
-                    string outputFile = Path.Combine(outputDirectory, fileName);
+                    WildcardOperation(inputPath, recursiveSearch, (string filePath) =>
+                    {
+                        string fileName = Path.GetFileName(filePath);
+                        string outputFile = Path.Combine(outputDirectory, fileName);
+                        bool shouldContinue = true;
 
-                    if (File.Exists(outputFile))
-                        success = FileUtil.DeleteFileOrDirectory(outputFile);
+                        if (File.Exists(outputFile))
+                            shouldContinue = FileUtility.Delete(outputFile, $"Could not overwrite existing file \"{outputFile}\".", out string errorString);
 
-                    if (!success)
-                        errorString = $"Could not overwrite existing file \"{outputPath}\".";
+                        if (shouldContinue)
+                            fileOperation(filePath, outputFile);
 
-                    FileUtil.CopyFileOrDirectory(fileList[i], outputFile);
+                        return shouldContinue;
+                    });
+                }
+                else
+                {
+                    if (overwrite && File.Exists(outputPath))
+                        success = FileUtility.Delete(outputPath, $"Could not overwrite existing file \"{outputPath}\".", out errorString);
+
+                    if (success)
+                        fileOperation(inputPath, outputPath);
                 }
             }
-            else if (success)
-            {
-                FileUtil.CopyFileOrDirectory(inputPath, outputPath);
-            }
 
-            if (!success && !string.IsNullOrEmpty(errorString))
-            {
-                BuildNotificationList.instance.AddNotification(new BuildNotification(
-                    BuildNotification.Category.Error,
-                    "File Copy Failed.", errorString,
-                    true, null));
-            }
+            FileUtility.OperationComplete(success, $"File {(isCopy ? "Copy" : "Move")} Failed.", errorString);
         }
 
         private void Delete(string inputPath)
@@ -201,45 +128,46 @@ namespace SuperUnityBuild.BuildActions
             string errorString = "";
             bool containsWildcard = FileUtility.ContainsWildcard(inputPath);
 
-            if (!containsWildcard && File.Exists(inputPath))
+            success = ValidatePath(inputPath, FileUtility.PathType.Input, true, out errorString);
+
+            if (success)
             {
-                success = FileUtil.DeleteFileOrDirectory(inputPath);
+                success = containsWildcard ?
+                    WildcardOperation(inputPath, recursiveSearch, (string filePath) =>
+                        FileUtility.Delete(filePath, $"Could not delete file \"{filePath}\".", out string errorString)
+                    ) :
+                    FileUtility.Delete(inputPath, $"Could not delete file \"{inputPath}\".", out errorString);
+            }
+
+            FileUtility.OperationComplete(success, "File Delete Failed.", errorString);
+        }
+
+        private bool ValidatePath(string path, FileUtility.PathType pathType, bool checkForExistence, out string errorString)
+        {
+            return FileUtility.ValidatePath(path, pathType, checkForExistence, true, out errorString);
+        }
+
+        private static bool WildcardOperation(string path, bool recursiveSearch, Func<string, bool> operation)
+        {
+            bool success = false;
+
+            string directory = Path.GetDirectoryName(path);
+
+            SearchOption option = recursiveSearch ?
+                SearchOption.AllDirectories :
+                SearchOption.TopDirectoryOnly;
+
+            string[] fileList = Directory.GetFiles(directory, Path.GetFileName(path), option);
+
+            for (int i = 0; i < fileList.Length; i++)
+            {
+                success = operation.Invoke(fileList[i]);
 
                 if (!success)
-                    errorString = $"Could not delete file \"{inputPath}\".";
-            }
-            else if (containsWildcard)
-            {
-                string inputDirectory = Path.GetDirectoryName(inputPath);
-
-                SearchOption option = recursiveSearch ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-                string[] fileList = Directory.GetFiles(inputDirectory, Path.GetFileName(inputPath), option);
-
-                for (int i = 0; i < fileList.Length; i++)
-                {
-                    if (!success)
-                        break;
-
-                    success = FileUtil.DeleteFileOrDirectory(fileList[i]); ;
-
-                    if (!success)
-                        errorString = $"Could not delete file \"{fileList[i]}\".";
-                }
-            }
-            else
-            {
-                // Error. File does not exist.
-                success = false;
-                errorString = $"Input \"{inputPath}\" does not exist.";
+                    break;
             }
 
-            if (!success && !string.IsNullOrEmpty(errorString))
-            {
-                BuildNotificationList.instance.AddNotification(new BuildNotification(
-                    BuildNotification.Category.Error,
-                    "File Delete Failed.", errorString,
-                    true, null));
-            }
+            return success;
         }
     }
 }

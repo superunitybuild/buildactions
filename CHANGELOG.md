@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 -   **Breaking change:** Drop support for versions of Unity older than 2020.3 LTS.
+-   Refactor `FileUtility` build action and fix exceptions when paths not configured.
 
 ## [2.2.0] - 2022-02-03
 
