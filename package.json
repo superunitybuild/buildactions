@@ -8,7 +8,7 @@
   "documentationUrl": "https://github.com/superunitybuild/buildtool/wiki",
   "licenseUrl": "LICENSE.md",
   "dependencies": {
-    "com.github.superunitybuild.buildtool": "2.1.0"
+    "com.github.superunitybuild.buildtool": "6.0.0"
   },
   "author": {
     "name": "SuperUnityBuild",
