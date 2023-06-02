@@ -1,7 +1,6 @@
 using SuperUnityBuild.BuildTool;
 using System;
 using System.IO;
-using System.Text;
 using UnityEditor;
 
 namespace SuperUnityBuild.BuildActions
@@ -54,27 +53,6 @@ namespace SuperUnityBuild.BuildActions
                     errorTitle, errorString,
                     true, null));
             }
-        }
-
-        public static string ResolvePath(string prototype)
-        {
-            StringBuilder sb = new StringBuilder(prototype);
-
-            sb.Replace("$VERSION", BuildProject.SanitizeFolderName(BuildSettings.productParameters.buildVersion));
-            sb.Replace("$BUILD", BuildSettings.productParameters.buildCounter.ToString());
-
-            return sb.ToString();
-        }
-
-        public static string ResolvePerBuildPath(string prototype, BuildReleaseType releaseType, BuildPlatform buildPlatform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, string buildPath)
-        {
-            return prototype != null ?
-                BuildProject.ResolvePath(
-                    prototype
-                        .Replace("$BUILDPATH", buildPath)
-                        .Replace("$BASEPATH", BuildSettings.basicSettings.baseBuildFolder),
-                    releaseType, buildPlatform, architecture, scriptingBackend, distribution, buildTime) :
-                null;
         }
 
         public static bool ValidatePath(string path, FileUtility.PathType pathType, bool checkForExistence, bool isFile, out string errorString)

@@ -65,22 +65,23 @@ namespace SuperUnityBuild.BuildActions
 
         #region Private Methods
 
-        private void Build(BuildPlatform platform, BuildArchitecture arch)
+        private void Build(BuildPlatform platform, BuildArchitecture architecture)
         {
-            if (!platform.enabled || !arch.enabled)
+            if (!platform.enabled || !architecture.enabled)
                 return;
 
             // Resolve build path.
-            StringBuilder platformBundlePath = new StringBuilder(Path.Combine(baseBuildPath, innerBuildPath));
-            platformBundlePath.Replace("$PLATFORM", BuildProject.SanitizeFolderName(platform.platformName));
-            platformBundlePath.Replace("$ARCHITECTURE", BuildProject.SanitizeFolderName(arch.name));
+            string platformBundlePath = TokensUtility.ResolveBuildConfigurationTokens(
+                Path.Combine(baseBuildPath, innerBuildPath),
+                null, platform, architecture, null, null, null
+            );
 
             // Create build destination directory if it does not exist.
-            if (!Directory.Exists(platformBundlePath.ToString()))
-                Directory.CreateDirectory(platformBundlePath.ToString());
+            if (!Directory.Exists(platformBundlePath))
+                Directory.CreateDirectory(platformBundlePath);
 
             // Build AssetBundles.
-            BuildPipeline.BuildAssetBundles(platformBundlePath.ToString(), options, arch.target);
+            BuildPipeline.BuildAssetBundles(platformBundlePath, options, architecture.target);
         }
 
         #endregion

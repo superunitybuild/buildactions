@@ -17,16 +17,16 @@ namespace SuperUnityBuild.BuildActions
 
         public override void Execute()
         {
-            string resolvedInputPath = FileUtility.ResolvePath(inputPath);
-            string resolvedOutputPath = FileUtility.ResolvePath(outputPath);
+            string resolvedInputPath = BuildAction.ResolveExecuteTokens(inputPath);
+            string resolvedOutputPath = BuildAction.ResolveExecuteTokens(outputPath);
 
             PerformOperation(resolvedInputPath, resolvedOutputPath);
         }
 
         public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
-            string resolvedInputPath = FileUtility.ResolvePerBuildPath(inputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
-            string resolvedOutputPath = FileUtility.ResolvePerBuildPath(outputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
+            string resolvedInputPath = BuildAction.ResolvePerBuildExecuteTokens(inputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
+            string resolvedOutputPath = BuildAction.ResolvePerBuildExecuteTokens(outputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
 
             PerformOperation(resolvedInputPath, resolvedOutputPath);
         }
