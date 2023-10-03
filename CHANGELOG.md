@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- ## [Unreleased] -->
 
+## [4.0.0] - 2023-10-03
+
+### Added
+
+-   Added support for new Per-Build and Single Run string tokens. Per-Build actions have gained support for `$BASEPATH` and `$BUILDPATH`, whilst Single Run actions can now use `$VERSION`, `$BUILD`, `$YEAR`, `$MONTH`, `$DAY` and `$TIME`, with the time-based tokens corresponding to the time at which the action was run.
+
+### Changed
+
+-   Standardised string token usage across Build Actions.
+
 ## [3.0.1] - 2023-05-23
 
 ### Fixed
@@ -97,7 +107,8 @@ This release includes all [previous commits][1.0.0] to the project, plus:
 
 -   `OverrideDefines` action no longer ignore pre build defines. [PR #17](https://github.com/superunitybuild/buildactions/pull/17)
 
-[unreleased]: https://github.com/superunitybuild/buildactions/compare/v3.0.1...HEAD
+[unreleased]: https://github.com/superunitybuild/buildactions/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/superunitybuild/buildactions/compare/v3.0.1...v4.0.0
 [3.0.1]: https://github.com/superunitybuild/buildactions/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/superunitybuild/buildactions/compare/v2.2.0...v3.0.0
 [2.2.0]: https://github.com/superunitybuild/buildactions/compare/v2.1.1...v2.2.0

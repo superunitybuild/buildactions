@@ -19,7 +19,7 @@ namespace SuperUnityBuild.BuildActions
 
             if (!string.IsNullOrEmpty(removeDefines))
             {
-                string resolvedRemove = BuildProject.ResolvePath(removeDefines, releaseType, platform, architecture, scriptingBackend, distribution, buildTime);
+                string resolvedRemove = TokensUtility.ResolveBuildConfigurationTokens(removeDefines, releaseType, platform, architecture, scriptingBackend, distribution, buildTime);
                 string[] splitRemove = resolvedRemove.Split(';');
 
                 for (int i = 0; i < splitRemove.Length; i++)
@@ -31,7 +31,7 @@ namespace SuperUnityBuild.BuildActions
 
             if (!string.IsNullOrEmpty(addDefines))
             {
-                string resolvedAdd = BuildProject.ResolvePath(addDefines, releaseType, platform, architecture, scriptingBackend, distribution, buildTime);
+                string resolvedAdd = TokensUtility.ResolveBuildConfigurationTokens(addDefines, releaseType, platform, architecture, scriptingBackend, distribution, buildTime);
 
                 if (mergedDefines.Length > 0)
                     mergedDefines.Append(";");

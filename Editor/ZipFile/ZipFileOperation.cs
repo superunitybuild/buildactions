@@ -14,11 +14,12 @@ namespace SuperUnityBuild.BuildActions
 
         public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref UnityEditor.BuildOptions options, string configKey, string buildPath)
         {
-            string resolvedOutputPath = Path.Combine(outputPath.Replace("$BUILDPATH", buildPath), outputFileName);
-            resolvedOutputPath = BuildProject.ResolvePath(resolvedOutputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime);
+            string resolvedOutputPath = Path.Combine(
+                BuildAction.ResolvePerBuildExecuteTokens(outputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath),
+                outputFileName
+            );
 
-            string resolvedInputPath = inputPath.Replace("$BUILDPATH", buildPath);
-            resolvedInputPath = BuildProject.ResolvePath(resolvedInputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime);
+            string resolvedInputPath = BuildAction.ResolvePerBuildExecuteTokens(inputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
 
             if (!resolvedOutputPath.EndsWith(".zip"))
                 resolvedOutputPath += ".zip";
