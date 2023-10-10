@@ -14,10 +14,8 @@ namespace SuperUnityBuild.BuildActions
 
         public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref UnityEditor.BuildOptions options, string configKey, string buildPath)
         {
-            string resolvedOutputPath = Path.Combine(
-                BuildAction.ResolvePerBuildExecuteTokens(outputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath),
-                outputFileName
-            );
+            string combinedOutputPath = Path.Combine(outputPath, outputFileName);
+            string resolvedOutputPath = BuildAction.ResolvePerBuildExecuteTokens(combinedOutputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
 
             string resolvedInputPath = BuildAction.ResolvePerBuildExecuteTokens(inputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
 
