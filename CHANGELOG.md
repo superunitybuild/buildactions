@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- ## [Unreleased] -->
 
+## [4.0.1] - 2023-10-10
+
+### Fixed
+
+-   Fixed output file name not being parsed for string tokens in `ZipFileOperation` action. (by [@cosformula](https://github.com/cosformula))
+
 ## [4.0.0] - 2023-10-03
 
 ### Added
@@ -107,7 +113,8 @@ This release includes all [previous commits][1.0.0] to the project, plus:
 
 -   `OverrideDefines` action no longer ignore pre build defines. [PR #17](https://github.com/superunitybuild/buildactions/pull/17)
 
-[unreleased]: https://github.com/superunitybuild/buildactions/compare/v4.0.0...HEAD
+[unreleased]: https://github.com/superunitybuild/buildactions/compare/v4.0.1...HEAD
+[4.0.1]: https://github.com/superunitybuild/buildactions/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/superunitybuild/buildactions/compare/v3.0.1...v4.0.0
 [3.0.1]: https://github.com/superunitybuild/buildactions/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/superunitybuild/buildactions/compare/v2.2.0...v3.0.0
