@@ -1,6 +1,7 @@
 ﻿using SuperUnityBuild.BuildTool;
 using System;
 using System.IO;
+using UnityEngine;
 #if NET_4_6 || NETSTANDARD2_0_OR_GREATER
 using System.IO.Compression;
 #else
