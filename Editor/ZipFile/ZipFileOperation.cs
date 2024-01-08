@@ -10,7 +10,6 @@ using Ionic.Zip;
 
 namespace SuperUnityBuild.BuildActions
 {
-
     public class ZipFileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction
     {
         public string inputPath = "$BUILDPATH";
@@ -29,6 +28,7 @@ namespace SuperUnityBuild.BuildActions
 
             PerformZip(Path.GetFullPath(resolvedInputPath), Path.GetFullPath(resolvedOutputPath), platform);
         }
+
         private void PerformZip(string inputPath, string outputPath, BuildPlatform platform)
         {
             try
