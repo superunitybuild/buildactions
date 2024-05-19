@@ -1,136 +1,239 @@
+using Mono.CSharp;
 using SuperUnityBuild.BuildTool;
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace SuperUnityBuild.BuildActions
 {
-    public class GithubReleaseCreator : BuildAction, IPostBuildAction, IPostBuildPerPlatformAction
+    public class GithubReleaseCreator : BuildAction, IPostBuildPerPlatformAction
     {
-        [Header("About the Owner")]
-        [SerializeField] private string owner = "YourGitHubUsername";
-        [SerializeField] private string repo = "YourRepositoryName";
-        [SerializeField] private string token = "YourGitHubToken";
-
-        [Header("About the Release")]
-        [SerializeField] private string releaseName = "v1.0.0";
-        [SerializeField] private string folderPath = "Assets/FolderToZip";
-        [Multiline][SerializeField] private string releaseNotes = "Release Notes";
+        public string Owner = "your-github-username";
+        public string Repo = "your-repo-name";
+        public string Token = "your-personal-access-token";
+        public string ReleaseBody = "Description of the release";
+        private string TagName = "v1.0.0";
+        private string ReleaseName = "Release v1.0.0";
+        private string FolderPath = "Path/To/Your/Folder";
+        private static readonly int MaxRetryAttempts = 3;
+        private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(2);
 
         public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
-            string _folderPath = ResolvePerBuildExecuteTokens(folderPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
-            UploadRelease(_folderPath);
+            Debug.Log(buildPath);
+            FolderPath = buildPath;
+            TagName = "v" + BuildSettings.productParameters.buildVersion;
+            ReleaseName = "Release v" + BuildSettings.productParameters.buildVersion;
+            _ = CheckAndCreateOrUpdateRelease();
         }
 
-        private void UploadRelease(string _folderPath)
+        private async Task CheckAndCreateOrUpdateRelease()
         {
-            string zipFilePath = ZipFolder(_folderPath);
-            if (string.IsNullOrEmpty(zipFilePath))
+            try
             {
-                Debug.LogError("Failed to zip the folder. Please check the folder path.");
+                using (HttpClient client = new HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromMinutes(10);
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("Unity-GithubRelease");
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", Token);
+
+                    var existingReleaseId = await GetExistingReleaseId(client);
+                    if (existingReleaseId.HasValue)
+                    {
+                        Debug.Log("Release already exists. Uploading assets to the existing release.");
+                        await UploadAssetsToRelease(client, existingReleaseId.Value);
+                    }
+                    else
+                    {
+                        Debug.Log("Release does not exist. Creating a new release.");
+                        await CreateAndUploadNewRelease(client);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error in CheckAndCreateOrUpdateRelease: {ex.Message}");
+            }
+        }
+
+        private async Task<int?> GetExistingReleaseId(HttpClient client)
+        {
+            try
+            {
+                var response = await client.GetAsync($"https://api.github.com/repos/{Owner}/{Repo}/releases/tags/{TagName}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var releaseResponse = JsonUtility.FromJson<ReleaseResponse>(await response.Content.ReadAsStringAsync());
+                    return releaseResponse.id;
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+                else
+                {
+                    Debug.LogError($"Failed to check existing release: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Exception in GetExistingReleaseId: {ex.Message}");
+                return null;
+            }
+        }
+
+        private async Task CreateAndUploadNewRelease(HttpClient client)
+        {
+            var releaseData = new ReleaseData
+            {
+                tag_name = TagName,
+                name = ReleaseName,
+                body = ReleaseBody,
+                draft = false,
+                prerelease = false
+            };
+
+            Debug.Log("Creating release with data: " + JsonUtility.ToJson(releaseData));
+
+            try
+            {
+                var content = new StringContent(JsonUtility.ToJson(releaseData), Encoding.UTF8, "application/json");
+                var response = await client.PostAsync($"https://api.github.com/repos/{Owner}/{Repo}/releases", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Debug.Log("Release created successfully.");
+                    var releaseResponse = JsonUtility.FromJson<ReleaseResponse>(await response.Content.ReadAsStringAsync());
+                    await UploadAssetsToRelease(client, releaseResponse.id);
+                }
+                else
+                {
+                    Debug.LogError($"Failed to create release: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Exception in CreateAndUploadNewRelease: {ex.Message}");
+            }
+        }
+
+        private async Task UploadAssetsToRelease(HttpClient client, int releaseId)
+        {
+            var zipFilePath = ZipFolder(FolderPath);
+
+            if (!File.Exists(zipFilePath))
+            {
+                Debug.LogError($"Zip file not found at {zipFilePath}");
                 return;
             }
 
-            string apiUrl = $"https://api.github.com/repos/{owner}/{repo}/releases";
-            string json = $"{{\"tag_name\": \"{releaseName}\", \"name\": \"{releaseName}\", \"body\": \"{releaseNotes}\"}}";
+            var fileName = Path.GetFileName(zipFilePath);
+            var url = $"https://uploads.github.com/repos/{Owner}/{Repo}/releases/{releaseId}/assets?name={fileName}";
 
-            using (UnityWebRequest request = new UnityWebRequest(apiUrl, "POST"))
+            Debug.Log($"Uploading {fileName} to {url}");
+
+            try
             {
-                byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                request.SetRequestHeader("Content-Type", "application/json");
-                request.SetRequestHeader("Authorization", $"token {token}");
-                request.SendWebRequest();
+                var fileBytes = File.ReadAllBytes(zipFilePath);
+                Debug.Log($"Read {fileBytes.Length} bytes from {zipFilePath}");
 
-                while (!request.isDone)
+                using (var fileContent = new ByteArrayContent(fileBytes))
                 {
-                    // Wait for the request to complete
-                }
+                    fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/zip");
 
-                if (request.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError($"Failed to create release: {request.error}");
-                    return;
-                }
+                    Debug.Log("Starting upload...");
 
-                Debug.Log($"Release {releaseName} created successfully");
+                    for (int attempt = 1; attempt <= MaxRetryAttempts; attempt++)
+                    {
+                        try
+                        {
+                            var response = await client.PostAsync(url, fileContent);
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                Debug.Log($"Successfully uploaded {fileName}");
+                                return;
+                            }
+                            else
+                            {
+                                var responseBody = await response.Content.ReadAsStringAsync();
+                                Debug.LogError($"Failed to upload {fileName}: {response.StatusCode} - {responseBody}");
+                                if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                                {
+                                    Debug.LogError("Upload failed due to rate limiting or permissions issue.");
+                                    break; // No point in retrying if it's a permissions issue
+                                }
+                                else if (response.StatusCode == System.Net.HttpStatusCode.RequestEntityTooLarge)
+                                {
+                                    Debug.LogError("Upload failed due to the file being too large.");
+                                    break; // No point in retrying if the file size is the issue
+                                }
+                            }
+                        }
+                        catch (HttpRequestException httpEx)
+                        {
+                            Debug.LogError($"HttpRequestException on attempt {attempt}: {httpEx.Message}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.LogError($"Exception on attempt {attempt}: {ex.Message}");
+                        }
+
+                        if (attempt < MaxRetryAttempts)
+                        {
+                            Debug.Log($"Retrying upload in {RetryDelay.TotalSeconds} seconds...");
+                            await Task.Delay(RetryDelay);
+                        }
+                    }
+
+                    Debug.LogError("Failed to upload after multiple attempts.");
+                }
             }
-
-            apiUrl = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
-            string releaseID;
-
-            using (UnityWebRequest request = UnityWebRequest.Get(apiUrl))
+            catch (Exception ex)
             {
-                request.SetRequestHeader("Authorization", $"token {token}");
-                request.SendWebRequest();
-
-                while (!request.isDone)
-                {
-                    // Wait for the request to complete
-                }
-
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    string releasesJson = request.downloadHandler.text;
-                    string lineTwo = releasesJson.Split("\n")[1];
-                    releaseID = lineTwo.Substring(lineTwo.Length - 11, 9);
-                }
-                else
-                {
-                    Debug.LogError($"Failed to fetch releases: {request.error}");
-                    return;
-                }
-            }
-
-            apiUrl = $"https://uploads.github.com/repos/{owner}/{repo}/releases/{releaseID}/assets?name={Path.GetFileName(zipFilePath)}";
-
-            using (UnityWebRequest request = new UnityWebRequest(apiUrl, "POST"))
-            {
-                byte[] zipFileBytes = File.ReadAllBytes(zipFilePath);
-                request.uploadHandler = new UploadHandlerRaw(zipFileBytes);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                request.SetRequestHeader("Content-Type", "application/zip");
-                request.SetRequestHeader("Authorization", $"token {token}");
-                request.SendWebRequest();
-
-                while (!request.isDone)
-                {
-                    // Wait for the request to complete
-                }
-
-                if (request.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError($"Failed to upload zipfile: {request.error}");
-                }
-                else
-                {
-                    Debug.Log($"Zipfile uploaded successfully");
-                }
+                Debug.LogError($"Exception in UploadAssetsToRelease: {ex.Message}");
+                Debug.LogError($"Stack Trace: {ex.StackTrace}");
             }
         }
 
         private string ZipFolder(string folderPath)
         {
-            try
-            {
-                string buildParentFolder = Directory.GetParent(folderPath).FullName;
-                string zipFileName = $"{Path.GetFileName(buildParentFolder) +"-"+  Path.GetFileName(folderPath)}.zip";
-                string zipFilePath = Path.Combine(buildParentFolder + "\\", zipFileName);
+            var folderName = new DirectoryInfo(folderPath).Name;
+            var zipFilePath = Path.Combine(Path.GetDirectoryName(folderPath), Directory.GetParent(folderPath).Name + ".zip");
 
-                if (File.Exists(zipFilePath)) File.Delete(zipFilePath);
-                ZipFile.CreateFromDirectory(folderPath, zipFilePath);
-                return zipFilePath;
-            }
-            catch (Exception e)
+            if (File.Exists(zipFilePath))
             {
-                Debug.LogError($"Failed to zip folder: {e.Message}");
-                return null;
+                File.Delete(zipFilePath);
             }
+
+            Debug.Log($"Creating zip file: {zipFilePath} from folder: {folderPath}");
+            ZipFile.CreateFromDirectory(folderPath, zipFilePath);
+            Debug.Log($"Zip file created: {zipFilePath}");
+
+            return zipFilePath;
+        }
+
+        [Serializable]
+        private class ReleaseResponse
+        {
+            public int id;
+        }
+
+        [Serializable]
+        private class ReleaseData
+        {
+            public string tag_name;
+            public string name;
+            public string body;
+            public bool draft;
+            public bool prerelease;
         }
     }
 }
