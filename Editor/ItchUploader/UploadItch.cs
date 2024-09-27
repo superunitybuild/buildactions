@@ -1,4 +1,4 @@
-﻿using SuperUnityBuild.BuildTool;
+using SuperUnityBuild.BuildTool;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -38,7 +38,7 @@ namespace SuperUnityBuild.BuildActions
 
         #region Public Methods
 
-        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
+        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildTool.BuildTarget target, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
             // Verify that butler executable exists.
             if (!File.Exists(pathToButlerExe))
@@ -50,28 +50,28 @@ namespace SuperUnityBuild.BuildActions
             buildPath = Path.GetFullPath(buildPath);
 
             // Generate build args for the form: butler push {optional args} {build path} {itch username}/{itch game}:{channel}
-            StringBuilder scriptArguments = new StringBuilder("push ");
+            StringBuilder scriptArguments = new("push ");
 
-            switch (architecture.target)
+            switch (target.type)
             {
-                case BuildTarget.StandaloneOSX:
-                case BuildTarget.StandaloneLinux64:
+                case UnityEditor.BuildTarget.StandaloneOSX:
+                case UnityEditor.BuildTarget.StandaloneLinux64:
                     // Fix exe permissions for Linux/OSX.
-                    scriptArguments.Append("--fix-permissions ");
+                    _ = scriptArguments.Append("--fix-permissions ");
                     break;
             }
 
             if (useGeneratedBuildVersion)
             {
                 // Append generated versions string.
-                scriptArguments.Append(string.Format("--userversion \"{0}\" ", BuildSettings.productParameters.buildVersion));
+                _ = scriptArguments.Append(string.Format("--userversion \"{0}\" ", BuildSettings.productParameters.buildVersion));
             }
 
-            scriptArguments.Append("\"" + buildPath + "\"" + " " + nameOfItchUser + "/" + nameOfItchGame + ":");
+            _ = scriptArguments.Append("\"" + buildPath + "\"" + " " + nameOfItchUser + "/" + nameOfItchGame + ":");
 
-            scriptArguments.Append(!string.IsNullOrEmpty(itchChannelOverride) ?
+            _ = scriptArguments.Append(!string.IsNullOrEmpty(itchChannelOverride) ?
                 itchChannelOverride :
-                GetChannelName(channelName, architecture.target, releaseType)
+                GetChannelName(channelName, releaseType)
             );
 
             // UnityEngine.Debug.Log("Would have run itch uploader with following command line: \"" + pathToButlerExe + " " + scriptArguments + "\"");
@@ -85,25 +85,27 @@ namespace SuperUnityBuild.BuildActions
         private void RunScript(string scriptPath, string arguments)
         {
             // Create and start butler process.
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = Path.GetFullPath(scriptPath);
-            startInfo.UseShellExecute = showUploadProgress;
-            startInfo.CreateNoWindow = !showUploadProgress;
-            startInfo.RedirectStandardOutput = !showUploadProgress;
-            startInfo.RedirectStandardError = !showUploadProgress;
+            ProcessStartInfo startInfo = new()
+            {
+                FileName = Path.GetFullPath(scriptPath),
+                UseShellExecute = showUploadProgress,
+                CreateNoWindow = !showUploadProgress,
+                RedirectStandardOutput = !showUploadProgress,
+                RedirectStandardError = !showUploadProgress
+            };
 
             if (!string.IsNullOrEmpty(arguments))
                 startInfo.Arguments = arguments;
 
             Process proc = Process.Start(startInfo);
 
-            StringBuilder outputText = new StringBuilder();
+            StringBuilder outputText = new();
             if (!showUploadProgress)
             {
                 // Capture stdout.
                 proc.OutputDataReceived += (sendingProcess, outputLine) =>
                 {
-                    outputText.AppendLine(outputLine.Data);
+                    _ = outputText.AppendLine(outputLine.Data);
                 };
 
                 proc.BeginOutputReadLine();
@@ -115,16 +117,9 @@ namespace SuperUnityBuild.BuildActions
             // Display error if one occurred.
             if (proc.ExitCode != 0)
             {
-                string errString;
-                if (showUploadProgress)
-                {
-                    errString = "Run w/ ShowUploadProgress disabled to capture debug output to console.";
-                }
-                else
-                {
-                    errString = "Check console window for debug output.";
-                }
-
+                string errString = showUploadProgress
+                    ? "Run w/ ShowUploadProgress disabled to capture debug output to console."
+                    : "Check console window for debug output.";
                 BuildNotificationList.instance.AddNotification(new BuildNotification(
                     BuildNotification.Category.Error,
                     "Itch Upload Failed.", string.Format("Exit code: {0}\n{1}", proc.ExitCode, errString),
@@ -134,48 +129,49 @@ namespace SuperUnityBuild.BuildActions
             }
         }
 
-        private static string GetChannelName(string channelNameFormat, BuildTarget target, BuildReleaseType buildReleaseType)
+        private static string GetChannelName(string channelNameFormat, BuildReleaseType buildReleaseType)
         {
-            string platform = string.Empty;
             string architecture = string.Empty;
+            string platform;
+            UnityEditor.BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
 
             switch (target)
             {
                 // Windows
-                case BuildTarget.StandaloneWindows:
+                case UnityEditor.BuildTarget.StandaloneWindows:
                     platform = WINDOWS;
                     architecture = ARCHITECTURE_X86;
                     break;
-                case BuildTarget.StandaloneWindows64:
+                case UnityEditor.BuildTarget.StandaloneWindows64:
                     platform = WINDOWS;
                     architecture = ARCHITECTURE_X64;
                     break;
 
                 // Linux
-                case BuildTarget.StandaloneLinux64:
+                case UnityEditor.BuildTarget.StandaloneLinux64:
                     platform = LINUX;
                     architecture = ARCHITECTURE_X64;
                     break;
 
                 // OSX
-                case BuildTarget.StandaloneOSX:
+                case UnityEditor.BuildTarget.StandaloneOSX:
                     platform = OSX;
                     architecture = ARCHITECTURE_UNIVERSAL;
                     break;
 
                 // Android
-                case BuildTarget.Android:
+                case UnityEditor.BuildTarget.Android:
                     platform = ANDROID;
                     architecture = ARCHITECTURE_UNIVERSAL;
                     break;
 
                 // WebGL
-                case BuildTarget.WebGL:
+                case UnityEditor.BuildTarget.WebGL:
                     platform = WEBGL;
                     break;
 
                 // UWP
-                case BuildTarget.WSAPlayer:
+                case UnityEditor.BuildTarget.WSAPlayer:
                     platform = UWP;
                     architecture = EditorUserBuildSettings.wsaArchitecture;
                     break;

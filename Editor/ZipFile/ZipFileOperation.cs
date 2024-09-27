@@ -1,4 +1,4 @@
-﻿using Ionic.Zip;
+using Ionic.Zip;
 using SuperUnityBuild.BuildTool;
 using System;
 using System.IO;
@@ -12,12 +12,12 @@ namespace SuperUnityBuild.BuildActions
         public string outputPath = "$BUILDPATH";
         public string outputFileName = "$PRODUCT_NAME-$RELEASE_TYPE-$YEAR_$MONTH_$DAY.zip";
 
-        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref UnityEditor.BuildOptions options, string configKey, string buildPath)
+        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildTarget target, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref UnityEditor.BuildOptions options, string configKey, string buildPath)
         {
             string combinedOutputPath = Path.Combine(outputPath, outputFileName);
-            string resolvedOutputPath = BuildAction.ResolvePerBuildExecuteTokens(combinedOutputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
+            string resolvedOutputPath = ResolvePerBuildExecuteTokens(combinedOutputPath, releaseType, platform, target, scriptingBackend, distribution, buildTime, buildPath);
 
-            string resolvedInputPath = BuildAction.ResolvePerBuildExecuteTokens(inputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
+            string resolvedInputPath = ResolvePerBuildExecuteTokens(inputPath, releaseType, platform, target, scriptingBackend, distribution, buildTime, buildPath);
 
             if (!resolvedOutputPath.EndsWith(".zip"))
                 resolvedOutputPath += ".zip";
@@ -42,20 +42,18 @@ namespace SuperUnityBuild.BuildActions
                 string parentPath = Path.GetDirectoryName(outputPath);
                 if (!Directory.Exists(parentPath))
                 {
-                    Directory.CreateDirectory(parentPath);
+                    _ = Directory.CreateDirectory(parentPath);
                 }
 
                 // Delete old file if it exists.
                 if (File.Exists(outputPath))
                     File.Delete(outputPath);
 
-                using (ZipFile zip = new ZipFile(outputPath))
-                {
-                    zip.ParallelDeflateThreshold = -1; // Parallel deflate is bugged in DotNetZip, so we need to disable it.
-                    zip.UseZip64WhenSaving = Zip64Option.AsNecessary;
-                    zip.AddDirectory(inputPath);
-                    zip.Save();
-                }
+                using ZipFile zip = new(outputPath);
+                zip.ParallelDeflateThreshold = -1; // Parallel deflate is bugged in DotNetZip, so we need to disable it.
+                zip.UseZip64WhenSaving = Zip64Option.AsNecessary;
+                _ = zip.AddDirectory(inputPath);
+                zip.Save();
             }
             catch (Exception ex)
             {
