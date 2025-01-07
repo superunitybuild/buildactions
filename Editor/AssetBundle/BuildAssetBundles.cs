@@ -1,7 +1,6 @@
-﻿using SuperUnityBuild.BuildTool;
+using SuperUnityBuild.BuildTool;
 using System;
 using System.IO;
-using System.Text;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,7 +13,7 @@ namespace SuperUnityBuild.BuildActions
         [BuildTool.FilePath(true, true, "Select AssetBundle output directory.")]
         public string baseBuildPath = Path.Combine("bin", "bundles");
 
-        public string innerBuildPath = Path.Combine("$PLATFORM", "$ARCHITECTURE");
+        public string innerBuildPath = Path.Combine("$PLATFORM", "$TARGET");
 
         public BuildAssetBundleOptions options = BuildAssetBundleOptions.ChunkBasedCompression;
 
@@ -25,12 +24,12 @@ namespace SuperUnityBuild.BuildActions
         public override void PerBuildExecute(
             BuildReleaseType releaseType,
             BuildPlatform platform,
-            BuildArchitecture architecture,
+            BuildTool.BuildTarget target,
             BuildScriptingBackend scriptingBackend,
             BuildDistribution distribution,
             DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
-            Build(platform, architecture);
+            Build(platform, target);
         }
 
         public void BuildAll()
@@ -39,22 +38,16 @@ namespace SuperUnityBuild.BuildActions
 
             for (int i = 0; i < buildConfigs.Length; i++)
             {
-                BuildReleaseType releaseType;
-                BuildPlatform platform;
-                BuildArchitecture architecture;
-                BuildDistribution distribution;
-                BuildScriptingBackend scriptingBackend;
                 string configKey = buildConfigs[i];
-
-                BuildSettings.projectConfigurations.ParseKeychain(configKey, out releaseType, out platform, out architecture, out scriptingBackend, out distribution);
-                Build(platform, architecture);
+                _ = BuildSettings.projectConfigurations.ParseKeychain(configKey, out _, out BuildPlatform platform, out BuildTool.BuildTarget target, out _, out _);
+                Build(platform, target);
             }
         }
 
         protected override void DrawProperties(SerializedObject obj)
         {
-            EditorGUILayout.PropertyField(obj.FindProperty("baseBuildPath"));
-            EditorGUILayout.PropertyField(obj.FindProperty("innerBuildPath"));
+            _ = EditorGUILayout.PropertyField(obj.FindProperty("baseBuildPath"));
+            _ = EditorGUILayout.PropertyField(obj.FindProperty("innerBuildPath"));
             options = (BuildAssetBundleOptions)EditorGUILayout.EnumFlagsField("Options", options);
 
             if (GUILayout.Button("Run Now", GUILayout.ExpandWidth(true)))
@@ -65,23 +58,23 @@ namespace SuperUnityBuild.BuildActions
 
         #region Private Methods
 
-        private void Build(BuildPlatform platform, BuildArchitecture architecture)
+        private void Build(BuildPlatform platform, BuildTool.BuildTarget target)
         {
-            if (!platform.enabled || !architecture.enabled)
+            if (!platform.enabled || !target.enabled)
                 return;
 
             // Resolve build path.
             string platformBundlePath = TokensUtility.ResolveBuildConfigurationTokens(
                 Path.Combine(baseBuildPath, innerBuildPath),
-                null, platform, architecture, null, null, null
+                null, platform, target, null, null, null
             );
 
             // Create build destination directory if it does not exist.
             if (!Directory.Exists(platformBundlePath))
-                Directory.CreateDirectory(platformBundlePath);
+                _ = Directory.CreateDirectory(platformBundlePath);
 
             // Build AssetBundles.
-            BuildPipeline.BuildAssetBundles(platformBundlePath, options, architecture.target);
+            _ = BuildPipeline.BuildAssetBundles(platformBundlePath, options, target.type);
         }
 
         #endregion

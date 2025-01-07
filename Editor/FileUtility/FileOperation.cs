@@ -1,12 +1,11 @@
-﻿using SuperUnityBuild.BuildTool;
+using SuperUnityBuild.BuildTool;
 using System;
 using System.IO;
 using UnityEditor;
+using Operation = SuperUnityBuild.BuildActions.FileUtility.Operation;
 
 namespace SuperUnityBuild.BuildActions
 {
-    using Operation = FileUtility.Operation;
-
     public class FileOperation : BuildAction, IPreBuildAction, IPreBuildPerPlatformAction, IPostBuildAction, IPostBuildPerPlatformAction, IPreBuildPerPlatformActionCanConfigureEditor
     {
         [BuildTool.FilePath(false)]
@@ -18,16 +17,16 @@ namespace SuperUnityBuild.BuildActions
 
         public override void Execute()
         {
-            string resolvedInputPath = BuildAction.ResolveExecuteTokens(inputPath);
-            string resolvedOutputPath = BuildAction.ResolveExecuteTokens(outputPath);
+            string resolvedInputPath = ResolveExecuteTokens(inputPath);
+            string resolvedOutputPath = ResolveExecuteTokens(outputPath);
 
             PerformOperation(resolvedInputPath, resolvedOutputPath);
         }
 
-        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildArchitecture architecture, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
+        public override void PerBuildExecute(BuildReleaseType releaseType, BuildPlatform platform, BuildTool.BuildTarget target, BuildScriptingBackend scriptingBackend, BuildDistribution distribution, DateTime buildTime, ref BuildOptions options, string configKey, string buildPath)
         {
-            string resolvedInputPath = BuildAction.ResolvePerBuildExecuteTokens(inputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
-            string resolvedOutputPath = BuildAction.ResolvePerBuildExecuteTokens(outputPath, releaseType, platform, architecture, scriptingBackend, distribution, buildTime, buildPath);
+            string resolvedInputPath = ResolvePerBuildExecuteTokens(inputPath, releaseType, platform, target, scriptingBackend, distribution, buildTime, buildPath);
+            string resolvedOutputPath = ResolvePerBuildExecuteTokens(outputPath, releaseType, platform, target, scriptingBackend, distribution, buildTime, buildPath);
 
             PerformOperation(resolvedInputPath, resolvedOutputPath);
         }
@@ -36,15 +35,15 @@ namespace SuperUnityBuild.BuildActions
         {
             bool containsWildcard = FileUtility.ContainsWildcard(inputPath);
 
-            EditorGUILayout.PropertyField(obj.FindProperty("operation"));
+            _ = EditorGUILayout.PropertyField(obj.FindProperty("operation"));
 
             if (containsWildcard)
-                EditorGUILayout.PropertyField(obj.FindProperty("recursiveSearch"));
+                _ = EditorGUILayout.PropertyField(obj.FindProperty("recursiveSearch"));
 
-            EditorGUILayout.PropertyField(obj.FindProperty("inputPath"));
+            _ = EditorGUILayout.PropertyField(obj.FindProperty("inputPath"));
 
             if (operation != Operation.Delete)
-                EditorGUILayout.PropertyField(obj.FindProperty("outputPath"));
+                _ = EditorGUILayout.PropertyField(obj.FindProperty("outputPath"));
         }
 
         private void PerformOperation(string inputPath, string outputPath)
@@ -80,10 +79,9 @@ namespace SuperUnityBuild.BuildActions
             Action<string, string> fileOperation = FileUtility.GetCopyOrMoveAction(isCopy);
 
             bool success = true;
-            string errorString = "";
             bool containsWildcard = FileUtility.ContainsWildcard(inputPath);
 
-            success = ValidatePath(inputPath, FileUtility.PathType.Input, !containsWildcard, out errorString);
+            success = ValidatePath(inputPath, FileUtility.PathType.Input, !containsWildcard, out string errorString);
 
             if (success)
                 success = ValidatePath(outputPath, FileUtility.PathType.Output, false, out errorString);
@@ -94,7 +92,7 @@ namespace SuperUnityBuild.BuildActions
                 {
                     string outputDirectory = Path.GetDirectoryName(outputPath);
 
-                    WildcardOperation(inputPath, recursiveSearch, (string filePath) =>
+                    _ = WildcardOperation(inputPath, recursiveSearch, (string filePath) =>
                     {
                         string fileName = Path.GetFileName(filePath);
                         string outputFile = Path.Combine(outputDirectory, fileName);
@@ -125,10 +123,9 @@ namespace SuperUnityBuild.BuildActions
         private void Delete(string inputPath)
         {
             bool success = true;
-            string errorString = "";
             bool containsWildcard = FileUtility.ContainsWildcard(inputPath);
 
-            success = ValidatePath(inputPath, FileUtility.PathType.Input, true, out errorString);
+            success = ValidatePath(inputPath, FileUtility.PathType.Input, true, out string errorString);
 
             if (success)
             {
